@@ -1,0 +1,36 @@
+[
+  {
+    "IdTarea": 1,
+    "IdUsuarioTarea": 2,
+    "NombreTarea": "Tarea 1",
+    "DescripcionTarea": "acciones tarea 1",
+    "FechaCreacion": "2024-04-22T08:50:22",
+    "FechaVencimiento": "2025-04-22T08:50:22",
+    "ComentariosTareas": [
+      {
+        "IdComentarioTarea": 1,
+        "IdTarea": 1,
+        "IdUsuarioComentario": 1,
+        "FechaComentario": "2024-04-22T08:50:22",
+        "Comentario": "Bien resuelto"
+      }
+    ]
+  },
+  {
+    "IdTarea": 2,
+    "IdUsuarioTarea": 3,
+    "NombreTarea": "Tarea 2",
+    "DescripcionTarea": "acciones tarea 2",
+    "FechaCreacion": "2024-04-22T08:50:22",
+    "FechaVencimiento": "2025-04-22T08:50:22",
+    "ComentariosTareas": [
+      {
+        "IdComentarioTarea": 2,
+        "IdTarea": 2,
+        "IdUsuarioComentario": 1,
+        "FechaComentario": "2024-04-22T08:50:22",
+        "Comentario": "Bien resuelto 2"
+      }
+    ]
+  }
+]

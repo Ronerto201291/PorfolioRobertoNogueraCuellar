@@ -1,0 +1,284 @@
+.docs-page {
+  padding: 40px 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+// ===== HEADER =====
+.page-header {
+  text-align: center;
+  margin-bottom: 48px;
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px;
+  }
+  
+  p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+// ===== GRID LAYOUT =====
+.docs-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px;
+  
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===== SECTIONS =====
+.docs-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.doc-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e8e8e8;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 16px;
+  }
+  
+  .section-icon {
+    font-size: 1.3rem;
+  }
+}
+
+.section-content {
+  margin: 0 0 16px 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.code-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  
+  code {
+    flex: 1;
+    color: #a5f3a6;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+  }
+}
+
+.section-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  
+  li {
+    position: relative;
+    padding: 8px 0 8px 24px;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    
+    &::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+}
+
+// ===== GRAPHQL SECTION =====
+.graphql-section {
+  border: 2px solid #667eea;
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+}
+
+.graphql-intro {
+  margin: 0 0 20px 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  
+  code {
+    background: #e8e8e8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+  }
+}
+
+.graphql-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.graphql-example {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+  
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #667eea;
+  }
+  
+  .example-description {
+    margin: 0 0 12px 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+.graphql-code {
+  margin: 0;
+  
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  code {
+    color: #e2b714;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+}
+
+// ===== TECH STACK =====
+.tech-stack {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  color: #fff;
+  height: fit-content;
+  position: sticky;
+  top: 88px;
+  
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 20px;
+  }
+}
+
+.stack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stack-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  
+  .tech-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  
+  .tech-category {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.graphql-playground-link {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 20px;
+  
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0 0 12px 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+  
+  .playground-btn {
+    display: block;
+    text-align: center;
+    padding: 10px 16px;
+    background: #fff;
+    color: #667eea;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+// ===== FOOTER =====
+.docs-footer {
+  margin-top: 48px;
+  text-align: center;
+  
+  p {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f4ff;
+    color: #667eea;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .footer-icon {
+    font-size: 1.1rem;
+  }
+}

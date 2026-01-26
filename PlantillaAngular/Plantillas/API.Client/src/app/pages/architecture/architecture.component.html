@@ -1,0 +1,72 @@
+<div class="architecture-page">
+  <div class="page-container">
+    
+    <!-- Header -->
+    <header class="page-header">
+      <h1>🏗️ Arquitectura</h1>
+      <p>Clean Architecture con patrón CQRS</p>
+    </header>
+
+    <!-- Architecture Overview -->
+    <section class="arch-overview">
+      <h2>Vista general de la arquitectura</h2>
+      
+      <div class="layers-diagram">
+        <div *ngFor="let layer of layers; let i = index" 
+             class="layer-card"
+             [style.--layer-color]="layer.color">
+          <div class="layer-icon">{{ layer.icon }}</div>
+          <div class="layer-info">
+            <h3>{{ layer.name }}</h3>
+            <p>{{ layer.description }}</p>
+          </div>
+          <div *ngIf="i < layers.length - 1" class="layer-arrow">↓</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Request Flow -->
+    <section class="request-flow">
+      <h2>Flujo de una petición</h2>
+      
+      <div class="flow-diagram">
+        <div *ngFor="let step of requestFlow; let last = last" class="flow-step">
+          <span class="step-box">{{ step }}</span>
+          <span *ngIf="!last" class="step-arrow">→</span>
+        </div>
+      </div>
+      
+      <p class="flow-description">
+        Las interacciones del usuario fluyen a través de GraphQL, luego pasan por los handlers 
+        de la aplicación siguiendo CQRS, hasta llegar a la base de datos mediante repositorios.
+      </p>
+    </section>
+
+    <!-- Why This Architecture -->
+    <section class="arch-benefits">
+      <h2>¿Por qué esta arquitectura?</h2>
+      
+      <div class="benefits-grid">
+        <div *ngFor="let benefit of benefits" class="benefit-card">
+          <div class="benefit-check">✓</div>
+          <div class="benefit-content">
+            <h3>{{ benefit.title }}</h3>
+            <p>{{ benefit.description }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pattern Note -->
+    <footer class="arch-footer">
+      <div class="pattern-note">
+        <span class="note-icon">📐</span>
+        <div class="note-content">
+          <strong>Patrones de diseño utilizados</strong>
+          <span>Repository • CQRS • MediatR • Aggregate Root • Domain Events</span>
+        </div>
+      </div>
+    </footer>
+    
+  </div>
+</div>

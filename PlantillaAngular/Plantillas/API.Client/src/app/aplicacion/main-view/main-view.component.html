@@ -1,0 +1,159 @@
+
+
+<div class="dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="brand">
+        <span class="brand-icon">🚀</span>
+        <div class="brand-text">
+          <h1>Panel de Portfolio</h1>
+          <p>Aplicación Full-Stack • Clean Architecture • GraphQL</p>
+        </div>
+      </div>
+      
+      <div class="header-stats" *ngIf="!isLoading() && projects().length > 0">
+        <div class="stat-item">
+          <span class="stat-value">{{ projects().length }}</span>
+          <span class="stat-label">Proyectos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ getTotalTasks() }}</span>
+          <span class="stat-label">Total Tareas</span>
+        </div>
+        <div class="stat-item completed">
+          <span class="stat-value">{{ getCompletedTasks() }}</span>
+          <span class="stat-label">Completadas</span>
+        </div>
+        <div class="stat-item in-progress">
+          <span class="stat-value">{{ getInProgressTasks() }}</span>
+          <span class="stat-label">En Progreso</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notifications -->
+  <div class="notifications">
+    <div *ngIf="successMessage()" class="notification success">
+      <span>✓</span> {{ successMessage() }}
+    </div>
+    <div *ngIf="errorMessage()" class="notification error">
+      <span>⚠️</span> {{ errorMessage() }}
+      <button (click)="errorMessage.set(null)" class="close-btn">×</button>
+    </div>
+    <div *ngIf="isUpdating()" class="notification updating">
+      <span class="spinner"></span> Actualizando...
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando tu portfolio...</p>
+  </div>
+
+  <!-- Main Content -->
+  <main *ngIf="!isLoading()" class="dashboard-main">
+    <!-- Sidebar: Projects List -->
+    <aside class="projects-sidebar">
+      <div class="sidebar-header">
+        <h2>📁 Proyectos</h2>
+        <div class="sidebar-actions">
+          <button class="add-btn" (click)="openCreateModal()" title="Nuevo proyecto">➕</button>
+          <button class="refresh-btn" (click)="loadProjects()" title="Actualizar">🔄</button>
+        </div>
+      </div>
+      
+      <div class="projects-list">
+        <app-project-card 
+          *ngFor="let project of projects()"
+          [project]="project"
+          [selected]="selectedProject()?.projectId === project.projectId"
+          (selectProject)="selectProject($event)">
+        </app-project-card>
+        
+        <div *ngIf="projects().length === 0" class="empty-projects">
+          <span class="empty-icon">📭</span>
+          <p>No se encontraron proyectos</p>
+          <small>Haz clic en ➕ para crear uno nuevo</small>
+          <button class="create-first-btn" (click)="openCreateModal()">
+            ➕ Crear primer proyecto
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main: Kanban Board -->
+    <section class="kanban-section">
+      <div *ngIf="selectedProject()" class="project-header">
+        <div class="project-info">
+          <h2>{{ selectedProject()?.name }}</h2>
+          <p>{{ selectedProject()?.description }}</p>
+        </div>
+        <div class="project-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getProjectProgress(selectedProject()!)"></div>
+          </div>
+          <span class="progress-text">{{ getProjectProgress(selectedProject()!) }}% completado</span>
+        </div>
+      </div>
+      
+      <app-kanban-board 
+        *ngIf="selectedProject()"
+        [tasks]="selectedProject()?.tasks || []"
+        (taskStatusChanged)="onTaskStatusChanged($event)">
+      </app-kanban-board>
+      
+      <div *ngIf="!selectedProject() && projects().length > 0" class="select-project">
+        <span class="select-icon">👈</span>
+        <p>Selecciona un proyecto para ver las tareas</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal para crear proyecto -->
+<div class="modal-overlay" *ngIf="showCreateModal()" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>➕ Nuevo Proyecto</h2>
+      <button class="modal-close" (click)="closeCreateModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="projectName">Nombre del proyecto *</label>
+        <input 
+          type="text" 
+          id="projectName" 
+          [(ngModel)]="newProjectName"
+          placeholder="Ej: Mi aplicación web"
+          maxlength="200"
+          [disabled]="isCreating()">
+      </div>
+      
+      <div class="form-group">
+        <label for="projectDescription">Descripción (opcional)</label>
+        <textarea 
+          id="projectDescription" 
+          [(ngModel)]="newProjectDescription"
+          placeholder="Describe brevemente el proyecto..."
+          rows="3"
+          maxlength="1000"
+          [disabled]="isCreating()">
+        </textarea>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeCreateModal()" [disabled]="isCreating()">
+        Cancelar
+      </button>
+      <button class="btn-create" (click)="createProject()" [disabled]="isCreating() || !newProjectName.trim()">
+        <span *ngIf="isCreating()" class="spinner-small"></span>
+        {{ isCreating() ? 'Creando...' : 'Crear Proyecto' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,239 @@
+.architecture-page {
+  padding: 40px 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// ===== HEADER =====
+.page-header {
+  text-align: center;
+  margin-bottom: 48px;
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px;
+  }
+  
+  p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+// ===== SECTIONS =====
+section {
+  margin-bottom: 48px;
+  
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+}
+
+// ===== LAYERS DIAGRAM =====
+.layers-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.layer-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 2px solid #e8e8e8;
+  border-left: 4px solid var(--layer-color, #667eea);
+  border-radius: 10px;
+  position: relative;
+}
+
+.layer-icon {
+  font-size: 1.8rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.layer-info {
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+  }
+}
+
+.layer-arrow {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: #ccc;
+  z-index: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+// ===== REQUEST FLOW =====
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-box {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  backdrop-filter: blur(4px);
+}
+
+.step-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.flow-description {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+// ===== BENEFITS =====
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.benefit-card {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+}
+
+.benefit-check {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f5e9;
+  color: #4caf50;
+  border-radius: 50%;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.benefit-content {
+  h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+  }
+}
+
+// ===== FOOTER =====
+.arch-footer {
+  margin-top: 48px;
+}
+
+.pattern-note {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+}
+
+.note-icon {
+  font-size: 2rem;
+}
+
+.note-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  strong {
+    font-size: 0.95rem;
+    color: #1a1a2e;
+  }
+  
+  span {
+    font-size: 0.85rem;
+    color: #666;
+  }
+}
+
+// ===== RESPONSIVE =====
+@media (max-width: 600px) {
+  .flow-diagram {
+    padding: 20px;
+  }
+  
+  .step-box {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}

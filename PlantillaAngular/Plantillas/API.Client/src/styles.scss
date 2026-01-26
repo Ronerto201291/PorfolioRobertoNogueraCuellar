@@ -1,0 +1,154 @@
+/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/md-light-indigo/theme.css";
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+@import "./theme/variables.scss";
+@import "./theme/theme.css";
+
+* {
+  font-family: var(--ion-font-family);
+}
+
+p-button {
+  span {
+    color: var(--ion-color-primary-contrast);
+  }
+}
+
+.section {
+
+  &.bloque {
+    min-height: 100%;
+    height: 100%;
+    background-color: var(--ion-color-light);
+  }
+
+  &.conv_bloque {
+    background-color: var(--ion-color-primary-contrast);
+    overflow-y: auto;
+    height: calc(100vh - 215px);
+    max-height: calc(100vh - 215px);
+    padding: 0px 10;
+    overflow-x: hidden;
+  }
+}
+
+.chat-message {
+  width: 75%;
+  padding: 0;
+  margin-top: 4px;
+
+  .p-element {
+    padding: 0;
+  }
+
+  .p-card {
+    .p-card-header {
+      background: lightgrey;
+      padding: 15px 25px;
+      border-radius: 15px 15px 0 0;
+      text-align: right;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .p-card-body {
+      padding: 0 25px 15px;
+    }
+
+    .p-card-footer {
+      padding: 0;
+      opacity: 0.5;
+    }
+  }
+
+  &.userMessage {
+    margin-left: auto;
+
+    .p-card {
+      background-color: white !important;
+      border-radius: 15px 0 15px 15px;
+      margin-bottom: 25px;
+      margin-right: 25px;
+    }
+
+    .p-card-content {
+      padding-bottom: 0;
+    }
+
+    .p-card-header {
+      background-color: var(--ion-color-secondary);
+      border-radius: 15px 0 0 0;
+
+      &::before {
+        content: "Usuario";
+        float: left;
+        color: $primaryColor;
+      }
+    }
+  }
+
+  &.systemMessage {
+    .p-card {
+      background-color: white !important;
+      border-radius: 0 15px 15px 15px;
+    }
+
+    .p-card-header {
+      border-radius: 0 15px 0 0;
+      background-color: $primaryColor;
+
+      &::before {
+        content: "AgenteIA";
+        float: left;
+        color: var(--ion-color-light);
+      }
+
+      span {
+        color: var(--ion-color-light);
+      }
+    }
+  }
+}
+
+.systemMessage,
+.userMessage {
+  font-size: 14px !important;
+  font-weight: normal;
+}
+
+.p-inplace-display {
+  margin-left: -15px;
+  span {
+    font-size: 15px;
+    line-height: 125%;
+  }
+}
+
+.p-inplace-content {
+  input{
+    position: relative;
+    top: -0.75em;
+    font-size: 15px;
+    left: -8px;
+    border: none;
+    background-color: var(--ion-color-light);
+    padding:5px;
+  }
+  button{
+    position: relative;
+    top: -0.5em;
+    background-color: transparent;
+    border: none;
+    color: var(--ion-color-primary);
+  }
+}
+
+.icono_p{
+button{
+  height: 2rem !important;
+  width: 2rem !important;
+}
+}

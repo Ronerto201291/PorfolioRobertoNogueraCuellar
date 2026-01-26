@@ -1,0 +1,89 @@
+<div class="docs-page">
+  <div class="page-container">
+    
+    <!-- Header -->
+    <header class="page-header">
+      <h1>📄 Documentación</h1>
+      <p>Documentación técnica y guía de uso</p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="docs-grid">
+      
+      <!-- Sections -->
+      <div class="docs-sections">
+        <section *ngFor="let section of sections" class="doc-section">
+          <h2>
+            <span class="section-icon">{{ section.icon }}</span>
+            {{ section.title }}
+          </h2>
+          
+          <p *ngIf="section.content" class="section-content">
+            {{ section.content }}
+          </p>
+          
+          <div *ngIf="section.code" class="code-block">
+            <code>{{ section.code }}</code>
+          </div>
+          
+          <ul *ngIf="section.items && section.items.length > 0" class="section-list">
+            <li *ngFor="let item of section.items">{{ item }}</li>
+          </ul>
+        </section>
+
+        <!-- GraphQL Examples Section -->
+        <section class="doc-section graphql-section">
+          <h2>
+            <span class="section-icon">{{ graphqlExamples.icon }}</span>
+            {{ graphqlExamples.title }}
+          </h2>
+          
+          <p class="graphql-intro">
+            GraphQL permite consultar exactamente los datos que necesitas. 
+            Puedes probar estas queries en el <strong>GraphQL Playground</strong> disponible en 
+            <code>/graphql/portfolio</code>
+          </p>
+          
+          <div class="graphql-examples">
+            <div *ngFor="let example of graphqlExamples.queries" class="graphql-example">
+              <h3>{{ example.name }}</h3>
+              <p class="example-description">{{ example.description }}</p>
+              <div class="code-block graphql-code">
+                <pre><code>{{ example.code }}</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tech Stack Sidebar -->
+      <aside class="tech-stack">
+        <h3>🛠️ Stack Tecnológico</h3>
+        <div class="stack-list">
+          <div *ngFor="let tech of techStack" class="stack-item">
+            <span class="tech-name">{{ tech.name }}</span>
+            <span class="tech-category">{{ tech.category }}</span>
+          </div>
+        </div>
+        
+        <div class="graphql-playground-link">
+          <h4>🔮 Probar GraphQL</h4>
+          <p>Accede al playground interactivo:</p>
+          <a href="/graphql/portfolio" target="_blank" class="playground-btn">
+            Abrir GraphQL Playground
+          </a>
+        </div>
+      </aside>
+      
+    </div>
+
+    <!-- Footer Note -->
+    <footer class="docs-footer">
+      <p>
+        <span class="footer-icon">💡</span>
+        Este proyecto está diseñado para ser autocontenido. Clona, ejecuta y explora.
+      </p>
+    </footer>
+    
+  </div>
+</div>

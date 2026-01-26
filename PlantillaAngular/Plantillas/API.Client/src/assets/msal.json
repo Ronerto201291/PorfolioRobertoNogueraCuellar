@@ -1,0 +1,19 @@
+{
+  "auth": {
+    "clientId": "94d757e5-46d4-4de7-8b48-91ab3d30f2d7",
+    "authority": "https://login.microsoftonline.com/958b1b24-69b3-4348-ab8f-a5c7ecb3047f",
+    "redirectUri": "/private",
+    "postLogoutRedirectUri": "/logout",
+    "clientCapabilities": [ "CP1" ]
+  },
+  "cache": {
+    "cacheLocation": "BrowserCacheLocation.SessionStorage",
+    "storeAuthStateInCookie": false
+  },
+  "system": {
+    "loggerOptions": {
+      "logLevel": "LogLevel.Verbose",
+      "piiLoggingEnabled": false
+    }
+  }
+}

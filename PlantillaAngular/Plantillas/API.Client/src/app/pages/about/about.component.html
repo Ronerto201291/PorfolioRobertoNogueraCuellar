@@ -1,0 +1,96 @@
+<div class="about-page">
+  <div class="page-container">
+    
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-avatar">
+        <span class="avatar-icon">👨‍💻</span>
+      </div>
+      
+      <div class="profile-info">
+        <h1>{{ profile.name }}</h1>
+        <h2 class="profile-title">{{ profile.title }}</h2>
+        <p class="profile-description">{{ profile.description }}</p>
+        
+        <div class="profile-meta">
+          <span class="meta-item">
+            <span class="meta-icon">📍</span>
+            {{ profile.location }}
+          </span>
+          <span class="meta-item">
+            <span class="meta-icon">💼</span>
+            {{ profile.experience }}
+          </span>
+          <span class="meta-item">
+            <span class="meta-icon">📧</span>
+            {{ profile.email }}
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions">
+          <button class="cv-button" (click)="openCV()">
+            <span class="btn-icon">📄</span>
+            Ver CV (PDF)
+          </button>
+          <button class="linkedin-button" (click)="openLinkedIn()">
+            <span class="btn-icon">💼</span>
+            LinkedIn
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlights -->
+    <section class="highlights-section">
+      <h2>🎯 Destacado</h2>
+      <div class="highlights-grid">
+        <div *ngFor="let highlight of highlights" class="highlight-item">
+          <span class="highlight-check">✓</span>
+          {{ highlight }}
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="experience-section">
+      <h2>💼 Experiencia Profesional</h2>
+      <div class="timeline">
+        <div *ngFor="let exp of experience" class="timeline-item" [class.current]="exp.current">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <h3>{{ exp.role }}</h3>
+            <p class="company">{{ exp.company }}</p>
+            <p class="period">{{ exp.period }}</p>
+            <span *ngIf="exp.current" class="current-badge">Actual</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills-section">
+      <h2>🛠️ Stack Tecnológico</h2>
+      
+      <div class="skills-grid">
+        <div *ngFor="let skill of skills" class="skill-card">
+          <h3>{{ skill.category }}</h3>
+          <div class="skill-tags">
+            <span *ngFor="let item of skill.items" class="skill-tag">
+              {{ item }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="about-footer">
+      <p>
+        <span class="footer-icon">🎯</span>
+        Abierto a nuevos retos y oportunidades
+      </p>
+    </footer>
+    
+  </div>
+</div>

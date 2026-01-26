@@ -1,0 +1,104 @@
+[
+  {
+    "IdBlog": 1,
+    "Titulo": "blog 1",
+    "IdUsuarioOwner": 1,
+    "Posts": [
+      {
+        "IdPost": 1,
+        "IdBlogPost": 1,
+        "IdUsuarioPost": 1,
+        "TituloPost": "Bienvenido al blog1",
+        "ContenidoPost": "contenido blog 1",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 2,
+        "IdBlogPost": 1,
+        "IdUsuarioPost": 2,
+        "TituloPost": "muy buen blog 1!",
+        "ContenidoPost": "muy buen blog1!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 3,
+        "IdBlogPost": 1,
+        "IdUsuarioPost": 3,
+        "TituloPost": "muy buen blog 1!",
+        "ContenidoPost": "muy buen blog1!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      }
+    ]
+  },
+  {
+    "IdBlog": 2,
+    "Titulo": "blog 2",
+    "IdUsuarioOwner": 2,
+    "Posts": [
+      {
+        "IdPost": 4,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 1,
+        "TituloPost": "Bienvenido al blog1",
+        "ContenidoPost": "contenido blog 1",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 5,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 2,
+        "TituloPost": "muy buen blog 1!",
+        "ContenidoPost": "muy buen blog1!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 6,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 3,
+        "TituloPost": "muy buen blog 1!",
+        "ContenidoPost": "muy buen blog1!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      }
+    ]
+  },
+  {
+    "IdBlog": 3,
+    "Titulo": "blog 3",
+    "IdUsuarioOwner": 3,
+    "Posts": [
+      {
+        "IdPost": 7,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 1,
+        "TituloPost": "Bienvenido al blog1",
+        "ContenidoPost": "contenido blog 3",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 8,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 2,
+        "TituloPost": "muy buen blog 3!",
+        "ContenidoPost": "muy buen blog3!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      },
+      {
+        "IdPost": 9,
+        "IdBlogPost": 2,
+        "IdUsuarioPost": 3,
+        "TituloPost": "muy buen blog 3!",
+        "ContenidoPost": "muy buen blog3!",
+        "FechaPost": "2024-04-22T08:50:22"
+
+      }
+    ]
+  }
+]
