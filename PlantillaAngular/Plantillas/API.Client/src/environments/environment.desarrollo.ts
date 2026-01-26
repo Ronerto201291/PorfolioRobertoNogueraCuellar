@@ -1,9 +1,7 @@
-
+// Reemplazar la URL de la API con una variable de entorno para mayor seguridad
 export const environment = {
-  //url BFF
-  ApiUrl: 'https://localhost:50598/',
+  ApiUrl: process.env['API_URL'] || 'https://localhost:50598/',
   production: false,
-  
 };
 
 

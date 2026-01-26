@@ -106,6 +106,10 @@ namespace PruebaAngular.Api
                               .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                               .Select(uriString => new Uri(uriString));
 
+                // Reemplazar configuraciones sensibles con variables de entorno
+                var elasticUser = configuration["ElasticSearch:User"] ?? Environment.GetEnvironmentVariable("ELASTICSEARCH_USER");
+                var elasticPass = configuration["ElasticSearch:Pass"] ?? Environment.GetEnvironmentVariable("ELASTICSEARCH_PASS");
+
                 return new LoggerConfiguration()
                              .Enrich.WithElasticApmCorrelationInfo()
                              .Enrich.WithProperty("ApplicationContext", AppName)
@@ -116,7 +120,7 @@ namespace PruebaAngular.Api
                              {
                                  CustomFormatter = new EcsTextFormatter(),
                                  IndexFormat = "MGA-NSI-{0:yyyy.MM}",
-                                 ModifyConnectionSettings = x => x.BasicAuthentication(configuration["ElasticSearch:User"], configuration["ElasticSearch:Pass"])
+                                 ModifyConnectionSettings = x => x.BasicAuthentication(elasticUser, elasticPass)
                                                                  .ServerCertificateValidationCallback((o, certificate, chain, errors) => true)
                                                                  .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
 
