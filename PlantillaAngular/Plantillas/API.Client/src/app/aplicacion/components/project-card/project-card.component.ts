@@ -14,7 +14,7 @@ import { Project } from '../../../services/portfolio.service';
         <div class="project-stats">
           <span class="stat">
             <span class="stat-icon">📝</span>
-            {{ project.tasks?.length || 0 }} tareas
+            {{ project.tasks.length || 0 }} tareas
           </span>
           <span class="stat">
             <span class="stat-icon">✅</span>

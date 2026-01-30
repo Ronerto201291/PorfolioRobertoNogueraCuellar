@@ -34,9 +34,10 @@ export class MainViewComponent implements OnInit {
     
     this.portfolioService.getProjects().subscribe({
       next: (projects) => {
-        this.projects.set(projects);
-        if (projects.length > 0 && !this.selectedProject()) {
-          this.selectedProject.set(projects[0]);
+        const projectList = projects ?? [];
+        this.projects.set(projectList);
+        if (projectList.length > 0 && !this.selectedProject()) {
+          this.selectedProject.set(projectList[0]);
         }
         this.isLoading.set(false);
       },

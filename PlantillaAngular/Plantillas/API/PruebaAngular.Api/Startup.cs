@@ -60,13 +60,11 @@ namespace PruebaAngular.Api
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.AzureAd.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.CanalesOnline.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.PruebaAngular.json", optional: false, reloadOnChange: true)
-
-
+                .AddJsonFile($"appsettings.{envName}.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.AzureAd.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.CanalesOnline.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.PruebaAngular.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-
 
             return builder.Build();
         }
