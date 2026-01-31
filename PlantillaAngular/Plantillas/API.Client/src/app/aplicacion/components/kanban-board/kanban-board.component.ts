@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
+import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
 import { PortfolioTask } from '../../../services/portfolio.service';
 
 export interface KanbanColumn {
@@ -140,7 +141,9 @@ export interface KanbanColumn {
     .cdk-drop-list-dragging .task-card:not(.cdk-drag-placeholder) {
       transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
-  `]
+  `],
+  standalone: true,
+  imports: [CommonModule, DragDropModule]
 })
 export class KanbanBoardComponent {
   @Input() tasks: PortfolioTask[] = [];

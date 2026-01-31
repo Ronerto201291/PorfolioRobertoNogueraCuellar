@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { addIcons } from 'ionicons';
+import { addOutline, refreshOutline, createOutline, trashOutline } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { interval, Subscription, of } from 'rxjs';
 import { switchMap, catchError, finalize } from 'rxjs/operators';
@@ -9,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { IonicModule } from '@ionic/angular';
 
 // Interfaces estricta para evitar el error de 'any'
 interface HealthResponse {
@@ -37,7 +40,7 @@ export interface ActivitySummary {
 @Component({
   selector: 'app-rabbitmq-activity',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatSnackBarModule, IonicModule],
   // Inline template to avoid missing external template file
   template: `
     <div class="rabbitmq-activity" *ngIf="isVisible()">
@@ -57,8 +60,8 @@ export interface ActivitySummary {
           <div *ngIf="summary()?.failedCount">Failed: {{ summary()?.failedCount }}</div>
         </div>
       <div class="subscribe-email" style="margin:12px 0; display:flex; gap:8px; align-items:center;">
-        <input matInput placeholder="Email para notificaciones" [(ngModel)]="emailToSubscribe" style="flex:1" />
-        <button mat-flat-button color="primary" (click)="subscribeEmail()">Añadir</button>
+        <input placeholder="Email para notificaciones" [(ngModel)]="emailToSubscribe" style="flex:1" />
+        <ion-button fill="solid" color="primary" size="small" (click)="subscribeEmail()">Añadir</ion-button>
       </div>
         <div *ngIf="recentActivities().length === 0">No recent activity</div>
         <ul>
@@ -77,6 +80,14 @@ export interface ActivitySummary {
   ]
 })
 export class RabbitMqActivityComponent implements OnInit, OnDestroy {
+  constructor() {
+    // Register the specific icons to avoid extra network requests
+    try {
+      addIcons({ addOutline, refreshOutline, createOutline, trashOutline });
+    } catch {
+      // ignore in non-browser contexts
+    }
+  }
   private http = inject(HttpClient);
   private subscription?: Subscription;
   private snack = inject(MatSnackBar);

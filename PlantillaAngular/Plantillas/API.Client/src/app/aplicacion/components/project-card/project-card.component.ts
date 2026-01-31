@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { addIcons } from 'ionicons';
+import { createOutline, trashOutline } from 'ionicons/icons';
 import { Project } from '../../../services/portfolio.service';
 
 @Component({
@@ -127,6 +129,9 @@ import { Project } from '../../../services/portfolio.service';
   imports: [CommonModule, IonicModule]
 })
 export class ProjectCardComponent {
+  constructor() {
+    try { addIcons({ createOutline, trashOutline }); } catch {}
+  }
   @Input() project!: Project;
   @Input() selected = false;
   @Output() selectProject = new EventEmitter<Project>();

@@ -41,7 +41,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   declarations: [
     LoginComponent,
     LoggedinComponent,
-    KanbanBoardComponent
+    // KanbanBoardComponent is standalone and imported below
   ],
   imports: [
     CommonModule,
@@ -57,7 +57,10 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     MainViewComponent,
     ProjectCardComponent,
     TaskCardComponent
+    ,
+    KanbanBoardComponent
   ],
+  
   providers: [
     {
       provide: MSAL_GUARD_CONFIG,
@@ -69,7 +72,8 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     { provide: LOCALE_ID, useValue: 'es-ES' }
   ],
   exports: [
-    RouterModule
+    RouterModule,
+    // Additional exports can be added here
   ]
 })
 export class PrivateModule { }

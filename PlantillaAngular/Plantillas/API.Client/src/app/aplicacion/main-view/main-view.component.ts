@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { PortfolioService, Project, PortfolioTask } from '../../services/portfolio.service';
+import { ProjectCardComponent } from '../components/project-card/project-card.component';
+import { KanbanBoardComponent } from '../components/kanban-board/kanban-board.component';
+import { TaskCardComponent } from '../components/task-card/task-card.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditProjectDialogComponent, ProjectDialogData } from '../components/edit-project-dialog/edit-project-dialog.component';
@@ -12,7 +17,7 @@ import { EditTaskDialogComponent, TaskDialogData } from '../components/edit-task
   templateUrl: './main-view.component.html',
   styleUrls: ['./main-view.component.scss'],
   standalone: true,
-  imports: [IonicModule]
+  imports: [CommonModule, FormsModule, IonicModule, ProjectCardComponent, KanbanBoardComponent, TaskCardComponent]
 })
 export class MainViewComponent implements OnInit {
 

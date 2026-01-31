@@ -27,16 +27,19 @@ import { IonicModule } from '@ionic/angular';
         </div>
         
         <div class="task-actions">
-          <button *ngIf="task.status !== 'InProgress'" mat-mini-fab color="accent" class="action-fab" aria-label="Mover a En Progreso" (click)="changeStatus('InProgress')" matTooltip="Mover a En Progreso">
-            <mat-icon>play_arrow</mat-icon>
-          </button>
-          <button *ngIf="task.status !== 'Completed'" mat-mini-fab color="primary" class="action-fab" aria-label="Marcar como Completada" (click)="changeStatus('Completed')" matTooltip="Marcar como Completada">
-            <mat-icon>check</mat-icon>
-          </button>
-          <button *ngIf="task.status === 'Completed'" mat-mini-fab color="warn" class="action-fab" aria-label="Reabrir" (click)="changeStatus('Pending')" matTooltip="Reabrir tarea">
-            <mat-icon>undo</mat-icon>
-          </button>
-          <!-- Ionic style buttons (recommended) -->
+          <!-- Restore original small rounded icon buttons using ion-button with fill="clear" -->
+          <ion-button *ngIf="task.status !== 'InProgress'" fill="clear" size="small" (click)="changeStatus('InProgress')" aria-label="Mover a En Progreso">
+            <ion-icon name="play-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button *ngIf="task.status !== 'Completed'" fill="clear" size="small" (click)="changeStatus('Completed')" aria-label="Marcar como Completada">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button *ngIf="task.status === 'Completed'" fill="clear" size="small" (click)="changeStatus('Pending')" aria-label="Reabrir">
+            <ion-icon name="return-up-back-outline"></ion-icon>
+          </ion-button>
+
           <ion-button fill="clear" size="small" (click)="onEdit($event)" aria-label="Editar tarea" class="edit-btn">
             <ion-icon name="create-outline"></ion-icon>
           </ion-button>
@@ -58,98 +61,15 @@ import { IonicModule } from '@ionic/angular';
       cursor: grab;
     }
 
-    .task-card.completed {
-      background: #f8f9fa;
-      border-color: #28a745;
-    }
+    .task-footer { display:flex; justify-content:space-between; align-items:center }
 
-    .task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    .task-actions { display:flex; gap:8px; align-items:center }
 
-    .priority {
-      font-size: 0.8rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
+    ion-button { --padding-start: 6px; --padding-end: 6px; }
 
-    .priority-low { background: #e3f2fd; color: #1976d2; }
-    .priority-medium { background: #fff3e0; color: #f57c00; }
-    .priority-high { background: #ffebee; color: #d32f2f; }
-
-    .task-id {
-      font-size: 0.7rem;
-      color: #666;
-      font-family: monospace;
-    }
-
-    .task-title {
-      margin: 0 0 6px 0;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-
-    .task-description {
-      margin: 0 0 8px 0;
-      font-size: 0.8rem;
-      color: #666;
-      line-height: 1.3;
-    }
-
-    .task-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .task-meta {
-      flex: 1;
-    }
-
-    .due-date {
-      font-size: 0.75rem;
-      color: #666;
-    }
-
-    .due-date.overdue {
-      color: #d32f2f;
-      font-weight: 500;
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center !important; /* prevent stretch from parent flex */
-      align-self: center;
-    }
-
-    .action-btn {
-      background: none;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 2px;
-      border-radius: 4px;
-      transition: background 0.2s ease;
-    }
-    .action-fab { box-shadow: none; height:32px; width:32px; min-width:32px; align-self:center }
-    button.mat-mini-fab { box-shadow: none; align-self:center }
-
-    .action-fab:hover, button.mat-mini-fab:hover { transform: translateY(-2px); }
-
-    .edit-btn, .delete-btn { width: 36px; height: 36px; align-self:center }
-    .edit-btn mat-icon { color: #1976d2; }
-    .delete-btn mat-icon { color: #d32f2f; }
-
-    /* Ensure native buttons inside task-actions don't stretch */
-    .task-actions button, .task-actions ion-button { align-self: center; }
-  `]
-  ,
+    .edit-btn ion-icon { color:#1976d2 }
+    .delete-btn ion-icon { color:#d32f2f }
+  `],
   standalone: true,
   imports: [IonicModule]
 })
