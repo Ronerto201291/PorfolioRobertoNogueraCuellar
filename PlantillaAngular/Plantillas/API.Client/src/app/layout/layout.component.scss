@@ -1,20 +1,8 @@
-.app-layout {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #f8f9fa;
-}
-
-// ===== TOP NAVIGATION =====
+/* Use Ionic header/content; avoid fixed top nav causing body scroll */
 .top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 64px;
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
-  z-index: 1000;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -99,6 +87,31 @@
   color: #333;
 }
 
+/* Ensure inline SVG icons inside .nav-social inherit color */
+.nav-social svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Make social icons clearly visible on toolbar */
+.top-nav .nav-social a {
+  color: #333 !important;
+  background: transparent !important;
+}
+
+.top-nav .nav-social a svg,
+.top-nav .nav-social a path {
+  fill: currentColor !important;
+  opacity: 1 !important;
+}
+
+/* Slightly larger icons for better visibility */
+.top-nav .nav-social svg {
+  width: 22px;
+  height: 22px;
+}
+
 .rabbitmq-status {
   font-size: 1.2rem;
   padding: 4px 8px;
@@ -120,9 +133,10 @@
 
 // ===== MAIN CONTENT =====
 .main-content {
-  flex: 1;
-  margin-top: 64px;
-  min-height: calc(100vh - 64px);
+  --background: transparent;
+  padding: 0;
+  margin: 0;
+  min-height: auto;
 }
 
 // ===== RESPONSIVE =====

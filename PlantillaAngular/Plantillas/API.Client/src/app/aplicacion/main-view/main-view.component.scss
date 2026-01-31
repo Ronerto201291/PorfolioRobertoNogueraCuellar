@@ -1,8 +1,7 @@
-.dashboard {
-  min-height: 100vh;
-  background: #f5f7fa;
-  display: flex;
-  flex-direction: column;
+.dashboard-header { }
+
+ion-content.dashboard-grid {
+  --background: #f5f7fa;
 }
 
 // ===== HEADER =====
@@ -163,12 +162,7 @@
   font-size: 1rem;
 }
 
-// ===== MAIN LAYOUT =====
-.dashboard-main {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 0;
+.dashboard-grid {
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
@@ -186,9 +180,11 @@
   border-right: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  /* allow the sidebar to fit the viewport while letting inner list scroll */
+  max-height: calc(100vh - 120px);
   position: sticky;
   top: 0;
+  box-sizing: border-box;
 }
 
 .sidebar-header {
@@ -209,19 +205,80 @@
 .sidebar-actions {
   display: flex;
   gap: 4px;
+  align-items: center;
+  overflow: visible; /* avoid clipping of buttons */
 }
 
+/* Chocolate button style for "Nuevo" and "Nueva Tarea" */
+.chocolate-btn {
+  --background: chocolate;
+  --color: #fff;
+  --box-shadow: none;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(139,69,19,0.08);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-actions { display:flex; align-items:center; gap:12px }
+.project-actions .chocolate-btn { height:38px; padding: 0 12px; }
+
 .add-btn { display:flex; align-items:center; gap:8px }
-.add-btn .btn-label { margin-left:4px }
+.add-btn .btn-label { margin-left:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .refresh-btn { height:36px }
 
 .projects-list {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0; /* allow correct flex child scrolling */
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.projects-sidebar {
+  box-sizing: border-box; /* avoid accidental overflow from padding */
+  overflow-x: hidden;
+}
+
+.create-first-btn, .add-btn, .chocolate-btn {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Primary style for the 'Crear primer proyecto' button to match sidebar actions */
+.create-first-btn {
+  --background: var(--ion-color-primary, #3880ff);
+  --color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Modal content scroll containment */
+.modal-content {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Ensure kanban section doesn't cause double scrollbars */
+.kanban-section {
+  padding: 24px;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .empty-projects {
@@ -248,6 +305,57 @@
 }
 
 .create-first-btn { display:flex; align-items:center; gap:8px }
+
+/* Modal form improvements: remove unnecessary scrollbars and tidy fields */
+.modal-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-body .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.modal-body input[type="text"],
+.modal-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+
+.modal-footer { display:flex; gap:12px; justify-content:flex-end; padding: 12px 20px 20px }
+.btn-create {
+  --background: var(--ion-color-primary, #3880ff);
+  --color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+.btn-cancel {
+  --color: #666;
+}
+
+/* Prevent horizontal overflow in sidebar (no horizontal scrollbar) */
+.projects-sidebar, .projects-list {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide ugly default scrollbars on some platforms while keeping usability */
+.projects-list::-webkit-scrollbar, .modal-body::-webkit-scrollbar, .mat-mdc-dialog-panel .mat-mdc-dialog-content::-webkit-scrollbar {
+  height: 8px; width: 8px;
+}
+.projects-list::-webkit-scrollbar-thumb, .modal-body::-webkit-scrollbar-thumb, .mat-mdc-dialog-panel .mat-mdc-dialog-content::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.08);
+  border-radius: 6px;
+}
 
 // ===== KANBAN SECTION =====
 .kanban-section {

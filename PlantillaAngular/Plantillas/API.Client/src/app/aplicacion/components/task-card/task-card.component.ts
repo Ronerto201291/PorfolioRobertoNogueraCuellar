@@ -27,24 +27,23 @@ import { IonicModule } from '@ionic/angular';
         </div>
         
         <div class="task-actions">
-          <!-- Restore original small rounded icon buttons using ion-button with fill="clear" -->
-          <ion-button *ngIf="task.status !== 'InProgress'" fill="clear" size="small" (click)="changeStatus('InProgress')" aria-label="Mover a En Progreso">
-            <ion-icon name="play-outline"></ion-icon>
+          <ion-button *ngIf="task.status !== 'InProgress'" fill="clear" class="action-btn" (click)="changeStatus('InProgress')" aria-label="Mover a En Progreso">
+            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
           </ion-button>
 
-          <ion-button *ngIf="task.status !== 'Completed'" fill="clear" size="small" (click)="changeStatus('Completed')" aria-label="Marcar como Completada">
-            <ion-icon name="checkmark-outline"></ion-icon>
+          <ion-button *ngIf="task.status !== 'Completed'" fill="clear" class="action-btn" (click)="changeStatus('Completed')" aria-label="Marcar como Completada">
+            <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
           </ion-button>
 
-          <ion-button *ngIf="task.status === 'Completed'" fill="clear" size="small" (click)="changeStatus('Pending')" aria-label="Reabrir">
-            <ion-icon name="return-up-back-outline"></ion-icon>
+          <ion-button *ngIf="task.status === 'Completed'" fill="clear" class="action-btn" (click)="changeStatus('Pending')" aria-label="Reabrir">
+            <ion-icon slot="icon-only" name="return-up-back-outline"></ion-icon>
           </ion-button>
 
-          <ion-button fill="clear" size="small" (click)="onEdit($event)" aria-label="Editar tarea" class="edit-btn">
-            <ion-icon name="create-outline"></ion-icon>
+          <ion-button fill="clear" class="action-btn edit-btn" (click)="onEdit($event)" aria-label="Editar tarea">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
           </ion-button>
-          <ion-button fill="clear" size="small" color="danger" (click)="onDelete($event)" aria-label="Eliminar tarea" class="delete-btn">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-button fill="clear" class="action-btn delete-btn" color="danger" (click)="onDelete($event)" aria-label="Eliminar tarea">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </div>
       </div>
@@ -66,6 +65,19 @@ import { IonicModule } from '@ionic/angular';
     .task-actions { display:flex; gap:8px; align-items:center }
 
     ion-button { --padding-start: 6px; --padding-end: 6px; }
+
+    .action-btn {
+      height: 36px;
+      width: 36px;
+      min-width: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      --padding-start: 6px;
+      --padding-end: 6px;
+      border-radius: 50%;
+      box-shadow: none;
+    }
 
     .edit-btn ion-icon { color:#1976d2 }
     .delete-btn ion-icon { color:#d32f2f }

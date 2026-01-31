@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, OnDestroy, OnInit,  signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AccountInfo } from '@azure/msal-browser';
-import { Subject, filter } from 'rxjs';
+import { Subject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent  implements OnInit, OnDestroy {
   isIframe = false;
   loginDisplay = false;
 
-  public sidebarItems= signal<any[] | null>(null);
+  public sidebarItems = signal<{ title: string; url: string; icon: string }[] | null>(null);
 
   private readonly _destroying$ = new Subject<void>();
   public loading: boolean = false;
@@ -41,7 +42,7 @@ export class AppComponent  implements OnInit, OnDestroy {
 
   // unsubscribe to events when component is destroyed
   ngOnDestroy(): void {
-    this._destroying$.next(undefined);
+    this._destroying$.next();
     this._destroying$.complete();
   }
 

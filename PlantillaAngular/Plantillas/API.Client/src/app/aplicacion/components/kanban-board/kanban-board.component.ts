@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
+import { IonicModule } from '@ionic/angular';
 import { PortfolioTask } from '../../../services/portfolio.service';
 
 export interface KanbanColumn {
@@ -14,61 +15,60 @@ export interface KanbanColumn {
 @Component({
   selector: 'app-kanban-board',
   template: `
-    <div class="kanban-board">
-      <div class="kanban-column" *ngFor="let column of columns">
-        <div class="column-header" [style.background]="column.color">
-          <span class="column-icon">{{ column.icon }}</span>
-          <span class="column-title">{{ column.title }}</span>
-          <span class="column-count">{{ column.tasks.length }}</span>
-        </div>
-        
-        <div class="column-content"
-             cdkDropList
-             [cdkDropListData]="column.tasks"
-             [id]="column.id"
-             [cdkDropListConnectedTo]="getConnectedLists(column.id)"
-             (cdkDropListDropped)="onDrop($event, column.id)">
-          
-          <app-task-card 
-            *ngFor="let task of column.tasks"
-            [task]="task"
-            (statusChanged)="onStatusChange($event)"
-            (editTask)="onEditTask($event)"
-            (deleteTask)="onDeleteTask($event)"
-            cdkDrag
-            [cdkDragData]="task">
-            
-            <div class="drag-placeholder" *cdkDragPlaceholder></div>
-          </app-task-card>
-          
-          <div *ngIf="column.tasks.length === 0" class="empty-column">
-            <span class="empty-icon">📭</span>
-            <span class="empty-text">Sin tareas</span>
+    <ion-grid class="kanban-board" fixed>
+      <ion-row>
+        <ion-col *ngFor="let column of columns" size="12" size-md="4">
+          <div class="kanban-column">
+            <div class="column-header" [style.background]="column.color">
+              <span class="column-icon">{{ column.icon }}</span>
+              <span class="column-title">{{ column.title }}</span>
+              <span class="column-count">{{ column.tasks.length }}</span>
+            </div>
+
+            <div class="column-content"
+                 cdkDropList
+                 [cdkDropListData]="column.tasks"
+                 [id]="column.id"
+                 [cdkDropListConnectedTo]="getConnectedLists(column.id)"
+                 (cdkDropListDropped)="onDrop($event, column.id)">
+
+              <app-task-card 
+                *ngFor="let task of column.tasks"
+                [task]="task"
+                (statusChanged)="onStatusChange($event)"
+                (editTask)="onEditTask($event)"
+                (deleteTask)="onDeleteTask($event)"
+                cdkDrag
+                [cdkDragData]="task">
+                <div class="drag-placeholder" *cdkDragPlaceholder></div>
+              </app-task-card>
+
+              <div *ngIf="column.tasks.length === 0" class="empty-column">
+                <span class="empty-icon">📭</span>
+                <span class="empty-text">Sin tareas</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   `,
   styles: [`
     .kanban-board {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
-    
-    @media (max-width: 1024px) {
-      .kanban-board {
-        grid-template-columns: 1fr;
-      }
-    }
-    
+
     .kanban-column {
       background: #f8f9fa;
       border-radius: 12px;
       display: flex;
       flex-direction: column;
-      min-height: 400px;
+      min-height: auto;
+      height: auto;
     }
     
     .column-header {
@@ -97,10 +97,9 @@ export interface KanbanColumn {
     }
     
     .column-content {
-      flex: 1;
+      flex: 1 1 auto;
       padding: 12px;
-      overflow-y: auto;
-      min-height: 200px;
+      overflow: visible; /* let the page/ion-content handle scrolling */
     }
     
     .empty-column {
@@ -143,7 +142,7 @@ export interface KanbanColumn {
     }
   `],
   standalone: true,
-  imports: [CommonModule, DragDropModule]
+  imports: [CommonModule, DragDropModule, IonicModule]
 })
 export class KanbanBoardComponent {
   @Input() tasks: PortfolioTask[] = [];

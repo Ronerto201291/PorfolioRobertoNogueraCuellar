@@ -34,14 +34,10 @@
               },
               {
                 "glob": "**/*",
-                "input": "node_modules/ionicons/dist/ionicons/svg",
+                "input": "src/assets/svg",
                 "output": "./svg"
               },
-              {
-                "glob": "**/*",
-                "input": "src/svg",
-                "output": "svg"
-              },
+              
               "src/staticwebapp.config.json",
               "src/web.config"
 

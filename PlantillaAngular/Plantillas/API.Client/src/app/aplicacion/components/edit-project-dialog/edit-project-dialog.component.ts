@@ -17,7 +17,7 @@ export interface ProjectDialogData {
   imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   template: `
     <h1 mat-dialog-title>{{ data.name ? 'Editar Proyecto' : 'Nuevo Proyecto' }}</h1>
-    <div mat-dialog-content>
+    <div mat-dialog-content class="dialog-content">
       <mat-form-field appearance="fill" style="width:100%">
         <mat-label>Nombre</mat-label>
         <input matInput [(ngModel)]="data.name" maxlength="200" required>
@@ -34,6 +34,13 @@ export interface ProjectDialogData {
       </button>
     </div>
   `
+  ,
+  styles: [
+    `:host { display:block }
+     .dialog-content { max-height: 60vh; overflow: auto; padding-right: 4px }
+     mat-form-field { display: block; }
+    `
+  ]
 })
 export class EditProjectDialogComponent {
   // --- CAMBIO CLAVE AQUÍ ---

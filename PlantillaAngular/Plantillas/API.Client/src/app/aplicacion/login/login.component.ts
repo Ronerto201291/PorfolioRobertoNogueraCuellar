@@ -3,10 +3,11 @@ import { Router } from '@angular/router';
 // MSAL typings can be strict; use `as any` where necessary to avoid blocking compilation
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { MSAL_GUARD_CONFIG, MsalBroadcastService, MsalService } from '@azure/msal-angular';
+import { MSAL_GUARD_CONFIG, MsalBroadcastService, MsalService, MsalGuardConfiguration } from '@azure/msal-angular';
 // Keep rxjs imports minimal and use inject()
-import { Subject, filter, takeUntil } from 'rxjs';
-import { EventMessage, EventType, InteractionStatus, PopupRequest } from '@azure/msal-browser';
+import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { AuthenticationResult, InteractionStatus, EventMessage, EventType, PopupRequest } from '@azure/msal-browser';
 
 @Component({
   selector: 'app-login',
@@ -16,9 +17,10 @@ import { EventMessage, EventType, InteractionStatus, PopupRequest } from '@azure
 export class LoginComponent implements OnInit, OnDestroy {
   // dependencies via inject()
   private readonly router = inject(Router);
-  private readonly authService = inject(MsalService) as any;
-  private readonly msalBroadcastService = inject(MsalBroadcastService) as any;
-  private readonly msalGuardConfig = inject(MSAL_GUARD_CONFIG) as any;
+  private readonly authService = inject(MsalService) as MsalService;
+  private readonly msalBroadcastService = inject(MsalBroadcastService) as MsalBroadcastService;
+  // MSAL_GUARD_CONFIG can be provided as different shapes; cast via unknown to satisfy TS safely
+  private readonly msalGuardConfig = inject(MSAL_GUARD_CONFIG) as unknown as MsalGuardConfiguration | undefined;
 
   title = 'PruebaAngularFront';
   isIframe = false;
@@ -42,7 +44,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     const loginRequest = this.msalGuardConfig?.authRequest ? ({ ...this.msalGuardConfig.authRequest } as PopupRequest) : undefined;
     // use as any to avoid strict msal typing issues
     this.authService.loginPopup(loginRequest).subscribe({
-      next: (result: any) => {
+      next: (result: AuthenticationResult) => {
         // set active account and update UI
         try { this.authService.instance.setActiveAccount(result?.account); } catch { /* ignore */ }
         this.setLoginDisplay();
@@ -68,7 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.msalBroadcastService.inProgress$.pipe(filter((s: any) => s === InteractionStatus.None), takeUntil(this._destroying$)).subscribe(() => {
+    this.msalBroadcastService.inProgress$.pipe(filter((s: InteractionStatus) => s === InteractionStatus.None), takeUntil(this._destroying$)).subscribe(() => {
       this.setLoginDisplay();
       this.checkAndSetActiveAccount();
     });

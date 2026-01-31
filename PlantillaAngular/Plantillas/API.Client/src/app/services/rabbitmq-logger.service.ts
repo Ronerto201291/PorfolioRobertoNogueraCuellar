@@ -44,7 +44,7 @@ export class RabbitMqLoggerService {
     console.log(
       `%c[RabbitMQ] ${status} ${eventType} (EventId=${eventId})`,
       styles,
-      { timestamp, details: (activity as any).details }
+      { timestamp, details: (activity as unknown as { details?: unknown }).details }
     );
   }
 

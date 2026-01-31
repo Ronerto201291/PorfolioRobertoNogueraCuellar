@@ -171,3 +171,254 @@ button{
   width: 2rem !important;
 }
 }
+
+/* Global: hide native scrollbars while keeping scrolling behaviour inside intended containers
+   - prevent body from showing scrollbar (use ion-content for scrolling)
+   - hide visual scrollbars for all scrollable elements
+*/
+html, body {
+  height: 100%;
+  overflow: hidden; /* disable body scrollbar */
+}
+
+/* allow ionic content and explicit containers to scroll, but hide their scrollbars visually */
+ion-content,
+.projects-list,
+.kanban-section,
+.modal-body,
+.mat-mdc-dialog-panel .mat-mdc-dialog-content,
+.mat-dialog-container .mat-dialog-content {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide native scrollbars (WebKit) */
+ion-content::-webkit-scrollbar,
+.projects-list::-webkit-scrollbar,
+.kanban-section::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar,
+.mat-mdc-dialog-panel .mat-mdc-dialog-content::-webkit-scrollbar,
+.mat-dialog-container .mat-dialog-content::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Hide scrollbars for Firefox / IE */
+ion-content, .projects-list, .kanban-section, .modal-body, .mat-mdc-dialog-panel .mat-mdc-dialog-content, .mat-dialog-container .mat-dialog-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+/* Prevent horizontal overflow site-wide */
+html, body, ion-app, ion-content {
+  overflow-x: hidden !important;
+}
+
+/* Ensure readable default text color across ionic and material components */
+html, body, ion-app, ion-content, .mat-mdc-dialog-panel, .mat-dialog-container, .modal-content, .modal-body, .kanban-column, .projects-sidebar {
+  color: #1a1a2e !important;
+}
+
+/* Make sure toolbar text is visible on colored backgrounds */
+.dashboard-header {
+  color: #ffffff !important; /* dashboard header uses light text on gradient */
+}
+
+/* Top navigation should use dark text because its background is light */
+.top-nav, ion-toolbar {
+  color: #1a1a2e !important;
+}
+
+/* Buttons that rely on CSS variables should get explicit color fallback */
+.chocolate-btn, .btn-create, .create-first-btn {
+  color: #fff !important;
+}
+
+/* Material form field labels and inputs contrast */
+.mat-form-field-label, .mat-form-field-wrapper, .mat-input-element, .mat-select-value {
+  color: rgba(0,0,0,0.87) !important;
+}
+
+/* Ensure anchor links in nav are visible on toolbar */
+.top-nav .nav-menu a, .top-nav .nav-brand, ion-toolbar .nav-menu a {
+  color: #333 !important;
+}
+
+/* Strong overrides for Material MDC dialog and related classes so text is visible
+   These classes come from Angular Material (MDC) and some Web Components (hydrated).
+   We force a neutral white background and high-contrast text, center the container
+   and ensure dialog contents scroll internally instead of inheriting weird parent styles.
+*/
+.mat-mdc-dialog-container.mdc-dialog.cdk-dialog-container.mdc-dialog--open,
+.mat-mdc-dialog-container,
+.mdc-dialog,
+.mdc-dialog__container,
+.mat-mdc-dialog-panel,
+.mat-dialog-container {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+  z-index: 2000 !important;
+}
+
+/* Dialog panel visuals */
+.mat-mdc-dialog-panel,
+.mat-dialog-container {
+  max-width: 720px !important;
+  width: calc(100% - 32px) !important;
+  margin: 0 auto !important;
+  border-radius: 12px !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.36) !important;
+  overflow: hidden !important;
+}
+
+/* Ensure dialog content area scrolls internally with clear contrast */
+.mat-mdc-dialog-panel .mat-mdc-dialog-content,
+.mat-dialog-container .mat-dialog-content,
+.mat-mdc-dialog-container .mat-mdc-dialog-content,
+.mat-mdc-dialog-panel .mat-dialog-content {
+  max-height: calc(80vh - 120px) !important;
+  overflow-y: auto !important;
+  padding: 18px 20px !important;
+  color: #1a1a2e !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Titles, headers and form labels inside dialogs should be clearly visible */
+.mat-mdc-dialog-panel h1, .mat-mdc-dialog-panel h2, .mat-mdc-dialog-panel h3,
+.mat-dialog-container h1, .mat-dialog-container h2, .mat-dialog-container h3,
+.mat-mdc-dialog-panel .mat-mdc-dialog-title, .mat-dialog-title {
+  color: #111827 !important;
+}
+
+.mat-mdc-dialog-panel label, .mat-mdc-dialog-panel .mat-form-field-label,
+.mat-dialog-container label, .mat-dialog-container .mat-form-field-label {
+  color: rgba(0,0,0,0.85) !important;
+}
+
+/* Some webcomponents add 'hydrated' and other MD prefixes; ensure they do not hide text */
+.header-md, .header-collapse-none, .hydrated, .md {
+  color: unset !important;
+  background: unset !important;
+}
+
+/* If a dialog had transparent backgrounds from global theme, force opacity to 1 */
+.mat-mdc-dialog-panel, .mat-dialog-container, .mdc-dialog__container {
+  opacity: 1 !important;
+}
+
+/* Extra strong overrides for MDC dialog internals and header-like webcomponents */
+.mdc-dialog__container, .mdc-dialog__surface, .mdc-dialog__scrim {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+}
+
+/* Extra defensive styles for any header elements injected by MDC or 3rd-party libs */
+.mdc-top-app-bar, .mdc-top-app-bar__row, .mdc-top-app-bar__section, .mdc-top-app-bar__title,
+.header-md, .header-md *, .header-collapse-none, .mdc-dialog__title, .mat-mdc-dialog-title {
+  background: transparent !important;
+  color: #111827 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* Ensure any overlayed headings inside dialogs are visible and bold */
+.mat-mdc-dialog-panel h1, .mat-mdc-dialog-panel h2, .mat-mdc-dialog-panel h3,
+.mat-dialog-container h1, .mat-dialog-container h2, .mat-dialog-container h3,
+.mdc-dialog__title, .mat-mdc-dialog-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+/* Force contrast on dialog action text/buttons */
+.mat-mdc-dialog-actions button, .mat-mdc-dialog-actions a, .mdc-dialog__actions button {
+  color: #0f172a !important;
+}
+
+/* Strong catch-all to ensure dialog text is visible even when third-party styles apply strange rules */
+.mat-mdc-dialog-panel, .mat-mdc-dialog-panel *,
+.mat-dialog-container, .mat-dialog-container *,
+.mdc-dialog, .mdc-dialog *,
+.mdc-dialog__container, .mdc-dialog__container * {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  fill: #0f172a !important; /* SVGs */
+  -webkit-text-fill-color: #0f172a !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* Ensure any header-like elements used inside dialogs are visible */
+.header-md, .header-collapse-none, .hydrated, .mdc-dialog__title, .mat-mdc-dialog-title {
+  color: #0f172a !important;
+}
+
+/* Dialog header and collapse classes sometimes come from third-party libs; force visibility */
+.header-md, .header-md *, .header-collapse-none, .hydrated, .md {
+  color: #111827 !important;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ensure action buttons inside MDC dialogs are visible */
+.mdc-dialog .mat-mdc-dialog-actions button, .mat-mdc-dialog-actions button {
+  color: #1a1a2e !important;
+}
+
+/* Fix any inverted text due to SVG or icon overlays inside dialogs */
+.mat-mdc-dialog-panel svg, .mat-mdc-dialog-panel img { filter: none !important; }
+
+/* Improve appearance and behavior of Angular Material dialogs/overlays */
+/* Center overlays and avoid awkward scrollbars on small screens */
+.cdk-overlay-pane {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px !important;
+  box-sizing: border-box !important;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Style the Material dialog panel (MDC and legacy) */
+.mat-mdc-dialog-panel,
+.mat-dialog-container {
+  width: 100% !important;
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25) !important;
+  overflow: hidden !important; /* panel itself shouldn't scroll */
+}
+
+/* Keep dialog content scrollable within a max height */
+.mat-mdc-dialog-panel .mat-mdc-dialog-content,
+.mat-dialog-container .mat-dialog-content {
+  max-height: calc(80vh - 120px) !important;
+  overflow-y: auto !important;
+  padding: 16px 20px !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Tidy up scrollbars for dialog content */
+.mat-mdc-dialog-panel .mat-mdc-dialog-content::-webkit-scrollbar,
+.mat-dialog-container .mat-dialog-content::-webkit-scrollbar {
+  width: 8px;
+}
+.mat-mdc-dialog-panel .mat-mdc-dialog-content::-webkit-scrollbar-thumb,
+.mat-dialog-container .mat-dialog-content::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.12);
+  border-radius: 6px;
+}
+
+/* Ensure backdrop prevents body scroll when dialog open (safer UX) */
+body.cdk-global-scrollblock {
+  overflow: hidden !important;
+}

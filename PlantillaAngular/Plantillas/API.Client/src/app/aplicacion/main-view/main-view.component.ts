@@ -77,15 +77,17 @@ export class MainViewComponent implements OnInit {
       width: '400px',
       data: { name: '', description: '' } as ProjectDialogData
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.portfolioService.createProject(result.name, result.description).subscribe({
-          next: (project) => {
-            this.snackBar.open('Proyecto creado', 'Cerrar', { duration: 2000 });
-            this.loadProjects();
-          },
-          error: () => this.snackBar.open('Error al crear proyecto', 'Cerrar', { duration: 3000 })
-        });
+    dialogRef.afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          this.portfolioService.createProject(result.name, result.description).subscribe({
+            next: () => {
+              this.snackBar.open('Proyecto creado', 'Cerrar', { duration: 2000 });
+              this.loadProjects();
+            },
+            error: () => this.snackBar.open('Error al crear proyecto', 'Cerrar', { duration: 3000 })
+          });
+        }
       }
     });
   }
@@ -95,16 +97,18 @@ export class MainViewComponent implements OnInit {
       width: '400px',
       data: { name: project.name, description: project.description } as ProjectDialogData
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const updated = { ...project, name: result.name, description: result.description };
-        this.portfolioService.updateProject(updated).subscribe({
-          next: () => {
-            this.snackBar.open('Proyecto actualizado', 'Cerrar', { duration: 2000 });
-            this.loadProjects();
-          },
-          error: () => this.snackBar.open('Error al actualizar proyecto', 'Cerrar', { duration: 3000 })
-        });
+    dialogRef.afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          const updated = { ...project, name: result.name, description: result.description };
+          this.portfolioService.updateProject(updated).subscribe({
+            next: () => {
+              this.snackBar.open('Proyecto actualizado', 'Cerrar', { duration: 2000 });
+              this.loadProjects();
+            },
+            error: () => this.snackBar.open('Error al actualizar proyecto', 'Cerrar', { duration: 3000 })
+          });
+        }
       }
     });
   }
@@ -168,16 +172,18 @@ export class MainViewComponent implements OnInit {
         priority: task.priority
       } as TaskDialogData
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const updated = { ...task, ...result };
-        this.portfolioService.updateTask(updated).subscribe({
-          next: () => {
-            this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2000 });
-            this.loadProjects();
-          },
-          error: () => this.snackBar.open('Error al actualizar tarea', 'Cerrar', { duration: 3000 })
-        });
+    dialogRef.afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          const updated = { ...task, ...result };
+          this.portfolioService.updateTask(updated).subscribe({
+            next: () => {
+              this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2000 });
+              this.loadProjects();
+            },
+            error: () => this.snackBar.open('Error al actualizar tarea', 'Cerrar', { duration: 3000 })
+          });
+        }
       }
     });
   }
@@ -187,15 +193,17 @@ export class MainViewComponent implements OnInit {
       width: '320px',
       data: { message: `¿Eliminar la tarea "${task.title}"?` }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.portfolioService.deleteTask(task.taskId).subscribe({
-          next: () => {
-            this.snackBar.open('Tarea eliminada', 'Cerrar', { duration: 2000 });
-            this.loadProjects();
-          },
-          error: () => this.snackBar.open('Error al eliminar tarea', 'Cerrar', { duration: 3000 })
-        });
+    dialogRef.afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          this.portfolioService.deleteTask(task.taskId).subscribe({
+            next: () => {
+              this.snackBar.open('Tarea eliminada', 'Cerrar', { duration: 2000 });
+              this.loadProjects();
+            },
+            error: () => this.snackBar.open('Error al eliminar tarea', 'Cerrar', { duration: 3000 })
+          });
+        }
       }
     });
   }

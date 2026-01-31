@@ -9,7 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicModule } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { LayoutComponent } from './layout/layout.component';
-import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalGuard, MsalGuardConfiguration, MsalInterceptor, MsalInterceptorConfiguration, MsalService, ProtectedResourceScopes } from '@azure/msal-angular';
+import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalGuard, MsalInterceptor, MsalInterceptorConfiguration, MsalService, ProtectedResourceScopes } from '@azure/msal-angular';
 import { IPublicClientApplication, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import * as jsonData from '../assets/msal.json';
 import { protectedResources } from '../environments/auth-config';
@@ -29,7 +29,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 // Dialog components
 import { EditProjectDialogComponent } from './aplicacion/components/edit-project-dialog/edit-project-dialog.component';
 import { EditTaskDialogComponent } from './aplicacion/components/edit-task-dialog/edit-task-dialog.component';
-import { RabbitMqActivityComponent } from './aplicacion/components/rabbitmq-activity/rabbitmq-activity.component';
+// RabbitMqActivityComponent is a standalone component used dynamically; no direct import here to avoid unused import lint
 import { ConfirmDialog } from './aplicacion/main-view/main-view.component';
 import { RabbitMqLoggerService } from './services/rabbitmq-logger.service';
 
@@ -104,8 +104,7 @@ export function MSALInstanceFactory(): IPublicClientApplication {
     FormsModule,
     ReactiveFormsModule,
     IonicModule.forRoot(),
-    // Standalone dialog & activity components (import standalone modules so Angular recognizes Material tags)
-    // Standalone dialog & activity components (import standalone modules so Angular recognizes Material tags)
+    // Standalone dialog components (import standalone modules so Angular recognizes Material tags)
     EditProjectDialogComponent,
     EditTaskDialogComponent,
     HttpClientModule,

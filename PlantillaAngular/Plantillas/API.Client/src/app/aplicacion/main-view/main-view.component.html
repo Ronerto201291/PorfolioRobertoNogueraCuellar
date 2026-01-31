@@ -1,6 +1,5 @@
-<div class="dashboard">
-  <!-- Header -->
-  <header class="dashboard-header">
+<ion-header>
+  <ion-toolbar class="dashboard-header">
     <div class="header-content">
       <div class="brand">
         <span class="brand-icon">🚀</span>
@@ -9,7 +8,7 @@
           <p>Aplicación Full-Stack • Clean Architecture • GraphQL</p>
         </div>
       </div>
-      
+
       <div class="header-stats" *ngIf="!isLoading() && projects().length > 0">
         <div class="stat-item">
           <span class="stat-value">{{ projects().length }}</span>
@@ -29,10 +28,12 @@
         </div>
       </div>
     </div>
-  </header>
+  </ion-toolbar>
+</ion-header>
 
-  <!-- Notifications -->
-    <div class="notifications">
+<ion-content class="ion-padding">
+  <!-- Notifications positioned inside ion-content so body won't scroll -->
+  <div class="notifications">
     <div *ngIf="successMessage()" class="notification success">
       <span>✓</span> {{ successMessage() }}
     </div>
@@ -47,81 +48,132 @@
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading()" class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Cargando tu portfolio...</p>
-  </div>
+  <ng-container *ngIf="isLoading()">
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando tu portfolio...</p>
+    </div>
+  </ng-container>
 
-  <!-- Main Content -->
-  <main *ngIf="!isLoading()" class="dashboard-main">
-    <!-- Sidebar: Projects List -->
-    <aside class="projects-sidebar">
-      <div class="sidebar-header">
-        <h2>📁 Proyectos</h2>
-      <div class="sidebar-actions">
-          <ion-button fill="solid" color="primary" class="add-btn" (click)="openCreateProjectDialog()" aria-label="Nuevo proyecto">
-            <ion-icon slot="start" name="add-outline"></ion-icon>
-            <span class="btn-label">Nuevo</span>
-          </ion-button>
-          <ion-button fill="clear" class="refresh-btn" (click)="loadProjects()" aria-label="Actualizar">
-            <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
-          </ion-button>
-        </div>
+  <ion-grid *ngIf="!isLoading()" class="dashboard-grid">
+    <ion-row>
+      <ion-col size="12" size-md="4">
+        <aside class="projects-sidebar">
+          <div class="sidebar-header">
+            <h2>📁 Proyectos</h2>
+            <div class="sidebar-actions">
+              <ion-button fill="solid" class="add-btn chocolate-btn" (click)="openCreateProjectDialog()" aria-label="Nuevo proyecto">
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                <span class="btn-label">Nuevo</span>
+              </ion-button>
+              <ion-button fill="clear" class="refresh-btn" (click)="loadProjects()" aria-label="Actualizar">
+                <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="projects-list">
+            <app-project-card 
+              *ngFor="let project of projects()"
+              [project]="project"
+              [selected]="selectedProject()?.projectId === project.projectId"
+              (selectProject)="selectProject($event)"
+              (editProject)="openEditProjectDialog($event)"
+              (deleteProject)="confirmDeleteProject($event)">
+            </app-project-card>
+
+            <div *ngIf="projects().length === 0" class="empty-projects">
+              <span class="empty-icon">📭</span>
+              <p>No se encontraron proyectos</p>
+              <small>Haz clic en ➕ para crear uno nuevo</small>
+              <ion-button class="create-first-btn" fill="solid" color="primary" (click)="openCreateProjectDialog()">
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                Crear primer proyecto
+              </ion-button>
+            </div>
+          </div>
+        </aside>
+      </ion-col>
+
+      <ion-col size="12" size-md="8">
+        <section class="kanban-section">
+          <div *ngIf="selectedProject()" class="project-header">
+            <div class="project-info">
+              <h2>{{ selectedProject()?.name }}</h2>
+              <p>{{ selectedProject()?.description }}</p>
+            </div>
+            <div class="project-actions">
+              <ion-button fill="solid" class="chocolate-btn" (click)="openCreateTaskDialog(selectedProject()!)">
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                Nueva Tarea
+              </ion-button>
+            </div>
+          </div>
+
+          <app-kanban-board 
+            *ngIf="selectedProject()"
+            [tasks]="selectedProject()?.tasks || []"
+            (taskStatusChanged)="onTaskStatusChanged($event)"
+            (editTask)="openEditTaskDialog($event)"
+            (deleteTask)="confirmDeleteTask($event)">
+          </app-kanban-board>
+
+          <div *ngIf="!selectedProject() && projects().length > 0" class="select-project">
+            <span class="select-icon">👈</span>
+            <p>Selecciona un proyecto para ver las tareas</p>
+          </div>
+        </section>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Modal para crear proyecto (se mantiene simple) -->
+  <div class="modal-overlay" *ngIf="showCreateModal()" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>➕ Nuevo Proyecto</h2>
+        <ion-button fill="clear" class="modal-close" (click)="closeCreateModal()" aria-label="Cerrar modal">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
       </div>
       
-      <div class="projects-list">
-        <app-project-card 
-          *ngFor="let project of projects()"
-          [project]="project"
-          [selected]="selectedProject()?.projectId === project.projectId"
-          (selectProject)="selectProject($event)"
-          (editProject)="openEditProjectDialog($event)"
-          (deleteProject)="confirmDeleteProject($event)">
-        </app-project-card>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="projectName">Nombre del proyecto *</label>
+          <input 
+            type="text" 
+            id="projectName" 
+            [(ngModel)]="newProjectName"
+            placeholder="Ej: Mi aplicación web"
+            maxlength="200"
+            [disabled]="isCreating()">
+        </div>
         
-        <div *ngIf="projects().length === 0" class="empty-projects">
-          <span class="empty-icon">📭</span>
-          <p>No se encontraron proyectos</p>
-          <small>Haz clic en ➕ para crear uno nuevo</small>
-          <ion-button class="create-first-btn" fill="solid" color="primary" (click)="openCreateProjectDialog()">
-            <ion-icon slot="start" name="add-outline"></ion-icon>
-            Crear primer proyecto
-          </ion-button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main: Kanban Board -->
-    <section class="kanban-section">
-      <div *ngIf="selectedProject()" class="project-header">
-        <div class="project-info">
-          <h2>{{ selectedProject()?.name }}</h2>
-          <p>{{ selectedProject()?.description }}</p>
-        </div>
-        <div class="project-actions">
-          <ion-button fill="solid" color="primary" (click)="openCreateTaskDialog(selectedProject()!)">
-            <ion-icon slot="start" name="add-outline"></ion-icon>
-            Nueva Tarea
-          </ion-button>
+        <div class="form-group">
+          <label for="projectDescription">Descripción (opcional)</label>
+          <textarea 
+            id="projectDescription" 
+            [(ngModel)]="newProjectDescription"
+            placeholder="Describe brevemente el proyecto..."
+            rows="3"
+            maxlength="1000"
+            [disabled]="isCreating()">
+          </textarea>
         </div>
       </div>
       
-      <app-kanban-board 
-        *ngIf="selectedProject()"
-        [tasks]="selectedProject()?.tasks || []"
-        (taskStatusChanged)="onTaskStatusChanged($event)"
-        (editTask)="openEditTaskDialog($event)"
-        (deleteTask)="confirmDeleteTask($event)">
-      </app-kanban-board>
-      
-      <div *ngIf="!selectedProject() && projects().length > 0" class="select-project">
-        <span class="select-icon">👈</span>
-        <p>Selecciona un proyecto para ver las tareas</p>
+      <div class="modal-footer">
+        <ion-button fill="clear" class="btn-cancel" (click)="closeCreateModal()" [disabled]="isCreating()">
+          Cancelar
+        </ion-button>
+        <ion-button fill="solid" class="btn-create" (click)="createProject()" [disabled]="isCreating() || !newProjectName.trim()">
+          <span *ngIf="isCreating()" class="spinner-small"></span>
+          {{ isCreating() ? 'Creando...' : 'Crear Proyecto' }}
+        </ion-button>
       </div>
-    </section>
-  </main>
-</div>
+    </div>
+  </div>
+</ion-content>
 
 <!-- Modal para crear proyecto -->
 <div class="modal-overlay" *ngIf="showCreateModal()" (click)="closeCreateModal()">

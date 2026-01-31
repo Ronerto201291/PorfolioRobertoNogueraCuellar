@@ -5,11 +5,8 @@ import { addOutline, refreshOutline, createOutline, trashOutline, playOutline, c
 import { AppModule } from './app/app.module';
 
 // Register commonly used Ionicons globally to avoid network requests for SVGs
-try {
-  addIcons({ addOutline, refreshOutline, createOutline, trashOutline, playOutline, checkmarkOutline, returnUpBackOutline, closeOutline });
-} catch (e) {
-  // ignore in non-browser contexts
-}
+// Register icons globally
+addIcons({ addOutline, refreshOutline, createOutline, trashOutline, playOutline, checkmarkOutline, returnUpBackOutline, closeOutline });
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));

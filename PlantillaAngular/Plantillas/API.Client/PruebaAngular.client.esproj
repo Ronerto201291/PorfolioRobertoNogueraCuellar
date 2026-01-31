@@ -15,5 +15,6 @@
     <Folder Include="node_modules\" />
     <Folder Include="src\app\apiServices\" />
     <Folder Include="src\assets\styles\" />
+    <Folder Include="src\svg\" />
   </ItemGroup>
 </Project>

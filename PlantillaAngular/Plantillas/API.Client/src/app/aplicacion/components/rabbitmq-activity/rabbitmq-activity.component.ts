@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
-import { addIcons } from 'ionicons';
-import { addOutline, refreshOutline, createOutline, trashOutline } from 'ionicons/icons';
+// icons registered globally in main.ts
 import { HttpClient } from '@angular/common/http';
 import { interval, Subscription, of } from 'rxjs';
 import { switchMap, catchError, finalize } from 'rxjs/operators';
@@ -80,14 +79,7 @@ export interface ActivitySummary {
   ]
 })
 export class RabbitMqActivityComponent implements OnInit, OnDestroy {
-  constructor() {
-    // Register the specific icons to avoid extra network requests
-    try {
-      addIcons({ addOutline, refreshOutline, createOutline, trashOutline });
-    } catch {
-      // ignore in non-browser contexts
-    }
-  }
+  // icons are registered globally in main.ts
   private http = inject(HttpClient);
   private subscription?: Subscription;
   private snack = inject(MatSnackBar);
@@ -139,16 +131,16 @@ export class RabbitMqActivityComponent implements OnInit, OnDestroy {
   private startMonitoring() {
     this.checkConnectionStatus();
     this.subscription = interval(5000).pipe(
-      switchMap(() => this.http.get<any>('/api/activity?count=20')),
+      switchMap(() => this.http.get<EventActivity[]>('/api/activity?count=20')),
       catchError(() => of([] as EventActivity[]))
     ).subscribe(activities => this.updateSummary(activities));
   }
 
   private checkConnectionStatus(): void {
-    this.http.get('/hc').pipe(
-      catchError(() => of(null as any))
+    this.http.get<HealthResponse | null>('/hc').pipe(
+      catchError(() => of(null as HealthResponse | null))
     ).subscribe({
-      next: (health: any) => {
+      next: (health: HealthResponse | null) => {
         const rabbitMqHealth = health?.entries ? health.entries['rabbitmq-connection'] : null;
         this.connectionStatus.set(rabbitMqHealth?.status === 'Healthy' ? 'connected' : 'disconnected');
       },
@@ -158,7 +150,7 @@ export class RabbitMqActivityComponent implements OnInit, OnDestroy {
 
   // Helper removed duplicate; single implementation below handles formatting
 
-  private updateSummary(activities: any) {
+  private updateSummary(activities: EventActivity[] | { recentActivities?: EventActivity[]; items?: EventActivity[]; data?: EventActivity[] } | null) {
     // Normalize incoming data to an array
     const list: EventActivity[] = Array.isArray(activities)
       ? activities
