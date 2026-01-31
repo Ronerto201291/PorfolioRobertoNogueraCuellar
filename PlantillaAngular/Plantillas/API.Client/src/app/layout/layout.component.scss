@@ -79,7 +79,8 @@
 
 .nav-social {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
 }
 
 .nav-social a {
@@ -96,6 +97,25 @@
 .nav-social a:hover {
   background: #f0f0f0;
   color: #333;
+}
+
+.rabbitmq-status {
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.rabbitmq-status.connected {
+  background: #e8f5e8;
+  color: #388e3c;
+  box-shadow: 0 0 8px rgba(56, 142, 60, 0.3);
+}
+
+.rabbitmq-status.disconnected {
+  background: #ffebee;
+  color: #d32f2f;
+  box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
 }
 
 // ===== MAIN CONTENT =====

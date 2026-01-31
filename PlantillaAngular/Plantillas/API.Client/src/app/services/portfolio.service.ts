@@ -167,6 +167,28 @@ export class PortfolioService {
     }).pipe(map(response => response.data.deleteProject));
   }
 
+  updateProject(project: Project): Observable<Project> {
+    const mutation = `
+      mutation UpdateProject($id: UUID!, $name: String!, $description: String) {
+        updateProject(id: $id, name: $name, description: $description) {
+          projectId
+          name
+          description
+          createdAt
+        }
+      }
+    `;
+
+    return this.http.post<GraphQLResponse<{ updateProject: Project }>>(this.graphqlUrl, {
+      query: mutation,
+      variables: {
+        id: project.projectId,
+        name: project.name,
+        description: project.description
+      }
+    }).pipe(map(response => response.data.updateProject));
+  }
+
   createTask(projectId: string, title: string, status: string, priority: string, description: string | null = null): Observable<PortfolioTask> {
     const mutation = `
       mutation CreateTask($projectId: UUID!, $title: String!, $status: String!, $priority: String!, $description: String) {
@@ -215,5 +237,35 @@ export class PortfolioService {
       query: mutation, 
       variables: { id } 
     }).pipe(map(response => response.data.deleteTask));
+  }
+
+  updateTask(task: PortfolioTask): Observable<PortfolioTask> {
+    const mutation = `
+      mutation UpdateTask($id: UUID!, $title: String!, $description: String, $status: String!, $priority: String!, $dueDate: DateTime)
+      {
+        updateTask(id: $id, title: $title, description: $description, status: $status, priority: $priority, dueDate: $dueDate) {
+          taskId
+          projectId
+          title
+          description
+          status
+          priority
+          dueDate
+          createdAt
+        }
+      }
+    `;
+
+    return this.http.post<GraphQLResponse<{ updateTask: PortfolioTask }>>(this.graphqlUrl, {
+      query: mutation,
+      variables: {
+        id: task.taskId,
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        dueDate: task.dueDate
+      }
+    }).pipe(map(response => response.data.updateTask));
   }
 }

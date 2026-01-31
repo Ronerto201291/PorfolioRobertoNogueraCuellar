@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using PruebaAngular.Application.Commands;
 using PruebaAngular.Domain.AggregateModels.Portfolio;
+using PruebaAngular.Domain.Events;
 using PruebaAngular.Infrastructure.Data;
 using System;
 using System.Threading;
@@ -12,19 +13,22 @@ namespace PruebaAngular.Application.Handlers
     /// <summary>
     /// Handler para el comando CreateProjectCommand.
     /// Implementa la lógica de negocio para crear un proyecto.
-    /// Flujo: API ? Command ? Handler ? Infrastructure ? PostgreSQL
+    /// Flujo: API ? Command ? Handler ? Infrastructure ? PostgreSQL ? RabbitMQ
     /// </summary>
     public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, CreateProjectResult>
     {
         private readonly PruebaAngularContext _context;
+        private readonly IEventBus? _eventBus;
         private readonly ILogger<CreateProjectCommandHandler> _logger;
 
         public CreateProjectCommandHandler(
             PruebaAngularContext context,
-            ILogger<CreateProjectCommandHandler> logger)
+            ILogger<CreateProjectCommandHandler> logger,
+            IEventBus? eventBus = null)
         {
             _context = context;
             _logger = logger;
+            _eventBus = eventBus;
         }
 
         public async Task<CreateProjectResult> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
@@ -58,6 +62,16 @@ namespace PruebaAngular.Application.Handlers
                     "Proyecto creado exitosamente: {ProjectId} - {ProjectName}",
                     project.ProjectId,
                     project.Name);
+
+                // Publicar evento en RabbitMQ
+                if (_eventBus != null)
+                {
+                    await _eventBus.PublishAsync(new ProjectCreatedEvent
+                    {
+                        ProjectId = project.ProjectId,
+                        ProjectName = project.Name
+                    }, cancellationToken);
+                }
 
                 return CreateProjectResult.Ok(
                     project.ProjectId,

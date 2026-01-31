@@ -1,5 +1,3 @@
-
-
 <div class="dashboard">
   <!-- Header -->
   <header class="dashboard-header">
@@ -60,7 +58,7 @@
       <div class="sidebar-header">
         <h2>📁 Proyectos</h2>
         <div class="sidebar-actions">
-          <button class="add-btn" (click)="openCreateModal()" title="Nuevo proyecto">➕</button>
+          <button class="add-btn" (click)="openCreateProjectDialog()" title="Nuevo proyecto">➕</button>
           <button class="refresh-btn" (click)="loadProjects()" title="Actualizar">🔄</button>
         </div>
       </div>
@@ -70,14 +68,16 @@
           *ngFor="let project of projects()"
           [project]="project"
           [selected]="selectedProject()?.projectId === project.projectId"
-          (selectProject)="selectProject($event)">
+          (selectProject)="selectProject($event)"
+          (editProject)="openEditProjectDialog($event)"
+          (deleteProject)="confirmDeleteProject($event)">
         </app-project-card>
         
         <div *ngIf="projects().length === 0" class="empty-projects">
           <span class="empty-icon">📭</span>
           <p>No se encontraron proyectos</p>
           <small>Haz clic en ➕ para crear uno nuevo</small>
-          <button class="create-first-btn" (click)="openCreateModal()">
+          <button class="create-first-btn" (click)="openCreateProjectDialog()">
             ➕ Crear primer proyecto
           </button>
         </div>
@@ -91,18 +91,20 @@
           <h2>{{ selectedProject()?.name }}</h2>
           <p>{{ selectedProject()?.description }}</p>
         </div>
-        <div class="project-progress">
-          <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="getProjectProgress(selectedProject()!)"></div>
-          </div>
-          <span class="progress-text">{{ getProjectProgress(selectedProject()!) }}% completado</span>
+        <div class="project-actions">
+          <button mat-flat-button color="primary" (click)="openCreateTaskDialog(selectedProject()!)">
+            <mat-icon>add</mat-icon>
+            Nueva Tarea
+          </button>
         </div>
       </div>
       
       <app-kanban-board 
         *ngIf="selectedProject()"
         [tasks]="selectedProject()?.tasks || []"
-        (taskStatusChanged)="onTaskStatusChanged($event)">
+        (taskStatusChanged)="onTaskStatusChanged($event)"
+        (editTask)="openEditTaskDialog($event)"
+        (deleteTask)="confirmDeleteTask($event)">
       </app-kanban-board>
       
       <div *ngIf="!selectedProject() && projects().length > 0" class="select-project">

@@ -31,7 +31,9 @@ export interface KanbanColumn {
           <app-task-card 
             *ngFor="let task of column.tasks"
             [task]="task"
-            (statusChange)="onStatusChange($event)"
+            (statusChanged)="onStatusChange($event)"
+            (editTask)="onEditTask($event)"
+            (deleteTask)="onDeleteTask($event)"
             cdkDrag
             [cdkDragData]="task">
             
@@ -143,6 +145,8 @@ export interface KanbanColumn {
 export class KanbanBoardComponent {
   @Input() tasks: PortfolioTask[] = [];
   @Output() taskStatusChanged = new EventEmitter<{ taskId: string; newStatus: string }>();
+  @Output() editTask = new EventEmitter<PortfolioTask>();
+  @Output() deleteTask = new EventEmitter<PortfolioTask>();
 
   get columns(): KanbanColumn[] {
     return [
@@ -189,7 +193,15 @@ export class KanbanBoardComponent {
     }
   }
 
-  onStatusChange(event: { task: PortfolioTask; newStatus: string }): void {
-    this.taskStatusChanged.emit({ taskId: event.task.taskId, newStatus: event.newStatus });
+  onStatusChange(event: { taskId: string; newStatus: string }): void {
+    this.taskStatusChanged.emit({ taskId: event.taskId, newStatus: event.newStatus });
+  }
+
+  onEditTask(task: PortfolioTask): void {
+    this.editTask.emit(task);
+  }
+
+  onDeleteTask(task: PortfolioTask): void {
+    this.deleteTask.emit(task);
   }
 }

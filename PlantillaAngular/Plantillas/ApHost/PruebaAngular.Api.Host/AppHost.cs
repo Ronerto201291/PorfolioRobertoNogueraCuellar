@@ -12,15 +12,26 @@ var postgres = builder.AddPostgres("postgres")
 var portfolioDb = postgres.AddDatabase("portfolio", "portfolio");
 
 // ==========================================
+// MESSAGE BROKER (RabbitMQ via Docker)
+// ==========================================
+var rabbitmq = builder.AddRabbitMQ("rabbitmq")
+    .WithImageTag("3-management-alpine")
+    .WithDataVolume("portfolio-rabbitmq-data")
+    .WithManagementPlugin();  // Habilita UI de gestión en puerto 15672
+
+// ==========================================
 // BACKEND API
 // ==========================================
 var api = builder.AddProject<Projects.PruebaAngular_Api>("PruebaAngularApi")
     .WithReference(portfolioDb)
-    .WaitFor(portfolioDb);
+    .WithReference(rabbitmq)
+    .WaitFor(portfolioDb)
+    .WaitFor(rabbitmq);
 
 // URLs de acceso directo en el Dashboard de Aspire
 api.WithUrl($"{api.GetEndpoint("http")}/swagger", "Swagger UI");
 api.WithUrl($"{api.GetEndpoint("http")}/graphql/portfolio", "GraphQL Playground");
+api.WithUrl($"{api.GetEndpoint("http")}/hc", "Health Checks");
 
 // ==========================================
 // FRONTEND (Angular)

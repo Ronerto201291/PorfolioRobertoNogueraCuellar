@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, signal } from '@angular/core';
-import { PortfolioService, Project } from '../../services/portfolio.service';
+import { PortfolioService, Project, PortfolioTask } from '../../services/portfolio.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { EditProjectDialogComponent, ProjectDialogData } from '../components/edit-project-dialog/edit-project-dialog.component';
+import { EditTaskDialogComponent, TaskDialogData } from '../components/edit-task-dialog/edit-task-dialog.component';
 
 @Component({
   selector: 'app-main-view',
@@ -16,13 +20,17 @@ export class MainViewComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
   
-  // Modal para crear proyecto
+  // Modal para crear proyecto (legacy - será reemplazado por Angular Material)
   showCreateModal = signal<boolean>(false);
   newProjectName = '';
   newProjectDescription = '';
   isCreating = signal<boolean>(false);
 
-  constructor(private portfolioService: PortfolioService) { }
+  constructor(
+    private portfolioService: PortfolioService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) { }
 
   ngOnInit() {
     this.loadProjects();
@@ -54,7 +62,138 @@ export class MainViewComponent implements OnInit {
     this.successMessage.set(null);
   }
 
-  // ========== CREAR PROYECTO ==========
+  // ========== PROYECTOS ==========
+
+  openCreateProjectDialog(): void {
+    const dialogRef = this.dialog.open(EditProjectDialogComponent, {
+      width: '400px',
+      data: { name: '', description: '' } as ProjectDialogData
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.portfolioService.createProject(result.name, result.description).subscribe({
+          next: (project) => {
+            this.snackBar.open('Proyecto creado', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al crear proyecto', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  openEditProjectDialog(project: Project): void {
+    const dialogRef = this.dialog.open(EditProjectDialogComponent, {
+      width: '400px',
+      data: { name: project.name, description: project.description } as ProjectDialogData
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const updated = { ...project, name: result.name, description: result.description };
+        this.portfolioService.updateProject(updated).subscribe({
+          next: () => {
+            this.snackBar.open('Proyecto actualizado', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al actualizar proyecto', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  confirmDeleteProject(project: Project): void {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '320px',
+      data: { message: `¿Eliminar el proyecto "${project.name}"?` }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.portfolioService.deleteProject(project.projectId).subscribe({
+          next: () => {
+            this.snackBar.open('Proyecto eliminado', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al eliminar proyecto', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  // ========== TAREAS ==========
+
+  openCreateTaskDialog(project: Project): void {
+    const dialogRef = this.dialog.open(EditTaskDialogComponent, {
+      width: '400px',
+      data: {
+        title: '',
+        description: '',
+        status: 'Pending',
+        priority: 'Medium'
+      } as TaskDialogData
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.portfolioService.createTask(
+          project.projectId,
+          result.title,
+          result.status,
+          result.priority,
+          result.description
+        ).subscribe({
+          next: () => {
+            this.snackBar.open('Tarea creada', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al crear tarea', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  openEditTaskDialog(task: PortfolioTask): void {
+    const dialogRef = this.dialog.open(EditTaskDialogComponent, {
+      width: '400px',
+      data: {
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority
+      } as TaskDialogData
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const updated = { ...task, ...result };
+        this.portfolioService.updateTask(updated).subscribe({
+          next: () => {
+            this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al actualizar tarea', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  confirmDeleteTask(task: PortfolioTask): void {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '320px',
+      data: { message: `¿Eliminar la tarea "${task.title}"?` }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.portfolioService.deleteTask(task.taskId).subscribe({
+          next: () => {
+            this.snackBar.open('Tarea eliminada', 'Cerrar', { duration: 2000 });
+            this.loadProjects();
+          },
+          error: () => this.snackBar.open('Error al eliminar tarea', 'Cerrar', { duration: 3000 })
+        });
+      }
+    });
+  }
+
+  // ========== LEGACY (para compatibilidad) ==========
+
   openCreateModal(): void {
     this.newProjectName = '';
     this.newProjectDescription = '';
@@ -78,7 +217,7 @@ export class MainViewComponent implements OnInit {
           if (result?.projectId) {
             this.showSuccess('Proyecto creado exitosamente');
             this.closeCreateModal();
-            this.loadProjects(); // Recargar lista
+            this.loadProjects();
           } else {
             this.errorMessage.set('Error al crear el proyecto');
           }
@@ -120,18 +259,20 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  getStatusLabel(status: string): string {
-    switch (status) {
-      case 'Pending': return 'Pendiente';
-      case 'InProgress': return 'En Progreso';
-      case 'Completed': return 'Completada';
-      default: return status;
-    }
+  // ========== HELPERS ==========
+
+  getTotalTasks(): number {
+    return this.projects().reduce((total, project) => total + (project.tasks?.length || 0), 0);
   }
 
-  showSuccess(message: string): void {
-    this.successMessage.set(message);
-    setTimeout(() => this.successMessage.set(null), 3000);
+  getCompletedTasks(): number {
+    return this.projects().reduce((total, project) => 
+      total + (project.tasks?.filter(t => t.status === 'Completed').length || 0), 0);
+  }
+
+  getInProgressTasks(): number {
+    return this.projects().reduce((total, project) => 
+      total + (project.tasks?.filter(t => t.status === 'InProgress').length || 0), 0);
   }
 
   getProjectProgress(project: Project): number {
@@ -140,19 +281,44 @@ export class MainViewComponent implements OnInit {
     return Math.round((completed / project.tasks.length) * 100);
   }
 
-  getTotalTasks(): number {
-    return this.projects().reduce((sum, p) => sum + (p.tasks?.length || 0), 0);
+  private showSuccess(message: string): void {
+    this.successMessage.set(message);
+    setTimeout(() => this.successMessage.set(null), 3000);
   }
 
-  getCompletedTasks(): number {
-    return this.projects().reduce((sum, p) => 
-      sum + (p.tasks?.filter(t => t.status === 'Completed').length || 0), 0);
+  private getStatusLabel(status: string): string {
+    switch (status) {
+      case 'Pending': return 'Pendiente';
+      case 'InProgress': return 'En Progreso';
+      case 'Completed': return 'Completada';
+      default: return status;
+    }
   }
+}
 
-  getInProgressTasks(): number {
-    return this.projects().reduce((sum, p) => 
-      sum + (p.tasks?.filter(t => t.status === 'InProgress').length || 0), 0);
-  }
+// Diálogo de confirmación simple
+import { Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component as NgComponent } from '@angular/core';
+
+@NgComponent({
+  selector: 'confirm-dialog',
+  template: `
+    <h2 mat-dialog-title>Confirmar</h2>
+    <mat-dialog-content>
+      <p>{{ data.message }}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="dialogRef.close(false)">Cancelar</button>
+      <button mat-flat-button color="warn" (click)="dialogRef.close(true)">Eliminar</button>
+    </mat-dialog-actions>
+  `
+})
+export class ConfirmDialog {
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: { message: string }
+  ) {}
 }
 
 

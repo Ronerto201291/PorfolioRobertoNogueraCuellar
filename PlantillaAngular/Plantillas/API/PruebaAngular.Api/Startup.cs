@@ -1,6 +1,7 @@
 using PruebaAngular.Api.Filters;
 using PruebaAngular.Api.Security;
 using PruebaAngular.Api.GraphQL;
+using PruebaAngular.Api.Extensions;
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.IISIntegration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +31,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PruebaAngular.Api
 {
@@ -88,7 +91,12 @@ namespace PruebaAngular.Api
                 .AddHttpContextAccessor()
                 .AddMediatR(config=>config.RegisterServicesFromAssembly(typeof(IMediator).GetTypeInfo().Assembly))
                 .AddCustomCache(Configuration,_env)
+                .AddRabbitMqEventBus(Configuration)
                 .AddCustomHealthChecks(Configuration);
+
+            // Añadir health checks de RabbitMQ
+            services.AddHealthChecks()
+                .AddRabbitMqHealthChecks();
 
             // Configure GraphQL with HotChocolate
             services
@@ -171,11 +179,12 @@ namespace PruebaAngular.Api
 
             // Apply migrations and seed data (always in non-production)
             // NOTE: Uncomment after PostgreSQL is working
-            // if (_env.EnvironmentName != "Production")
-            // {
-            //     _logger.LogInformation("Environment: {Environment} - Initializing database...", _env.EnvironmentName);
-            //     app.MigrateAndSeedDatabaseAsync(_logger).GetAwaiter().GetResult();
-            // }
+            // Auto-inicializar base de datos en desarrollo
+            if (_env.EnvironmentName != "Production")
+            {
+                _logger.LogInformation("Environment: {Environment} - Auto-inicializando base de datos...", _env.EnvironmentName);
+                InitializeDatabaseAsync(app).GetAwaiter().GetResult();
+            }
 
             if (Configuration.GetValue<bool>("ApiUnitTest:SeedDatabase")
                 && Configuration.GetValue<bool>("ApiUnitTest:UseSqlLite"))
@@ -300,6 +309,55 @@ namespace PruebaAngular.Api
                     // GraphQL endpoint
                     endpoints.MapGraphQL("/graphql/portfolio");
                 });
+            }
+        }
+
+        /// <summary>
+        /// Inicializa la base de datos automáticamente al arrancar (solo en desarrollo).
+        /// Crea las tablas y siembra datos si no existen.
+        /// </summary>
+        private async Task InitializeDatabaseAsync(IApplicationBuilder app)
+        {
+            try
+            {
+                using var scope = app.ApplicationServices.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<PruebaAngularContext>();
+
+                // Esperar a que PostgreSQL esté listo
+                var maxRetries = 10;
+                for (int i = 0; i < maxRetries; i++)
+                {
+                    try
+                    {
+                        if (await context.Database.CanConnectAsync())
+                        {
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        _logger.LogWarning("Esperando conexión a PostgreSQL... intento {Attempt}/{MaxRetries}", i + 1, maxRetries);
+                        await Task.Delay(2000);
+                    }
+                }
+
+                // Crear tablas
+                await context.Database.ExecuteSqlRawAsync(Infrastructure.Data.Queries.DatabaseSetupQueries.CreateTables);
+                _logger.LogInformation("✅ Tablas de base de datos verificadas/creadas");
+
+                // Verificar si hay datos
+                var hasData = await context.Projects.AnyAsync();
+                if (!hasData)
+                {
+                    var projectId = Guid.NewGuid();
+                    await context.Database.ExecuteSqlRawAsync(
+                        Infrastructure.Data.Queries.DatabaseSetupQueries.GetSeedDataQuery(projectId.ToString()));
+                    _logger.LogInformation("✅ Datos semilla insertados");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al auto-inicializar la base de datos: {Message}", ex.Message);
             }
         }
     }

@@ -4,17 +4,34 @@ import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicModule } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { LayoutComponent } from './layout/layout.component';
-import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalGuard, MsalInterceptor, MsalInterceptorConfiguration, MsalService, ProtectedResourceScopes } from '@azure/msal-angular';
+import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalBroadcastService, MsalGuard, MsalGuardConfiguration, MsalInterceptor, MsalInterceptorConfiguration, MsalService, ProtectedResourceScopes } from '@azure/msal-angular';
 import { IPublicClientApplication, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import * as jsonData from '../assets/msal.json';
 import { protectedResources } from '../environments/auth-config';
 import { ConfigService } from './config.service';
 import { MutuMsalConfig } from './models/MutuMsalConfig';
+
+// Angular Material imports
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+// Dialog components
+import { EditProjectDialogComponent } from './aplicacion/components/edit-project-dialog/edit-project-dialog.component';
+import { EditTaskDialogComponent } from './aplicacion/components/edit-task-dialog/edit-task-dialog.component';
+import { RabbitMqActivityComponent } from './aplicacion/components/rabbitmq-activity/rabbitmq-activity.component';
+import { ConfirmDialog } from './aplicacion/main-view/main-view.component';
+import { RabbitMqLoggerService } from './services/rabbitmq-logger.service';
 
 /**
  * MSAL Angular will automatically retrieve tokens for resources
@@ -74,19 +91,34 @@ export function MSALInstanceFactory(): IPublicClientApplication {
 }
 
 @NgModule({
-declarations: [
-  AppComponent,
-  LayoutComponent
-],
-imports: [
-  BrowserModule,
-  CommonModule,
-  BrowserAnimationsModule,
-  AppRoutingModule,
-  FormsModule,
-  IonicModule.forRoot(),
-  HttpClientModule,
-],
+  declarations: [
+    AppComponent,
+    LayoutComponent,
+    ConfirmDialog
+  ],
+  imports: [
+    BrowserModule,
+    CommonModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    IonicModule.forRoot(),
+    // Standalone dialog & activity components (import standalone modules so Angular recognizes Material tags)
+    // Standalone dialog & activity components (import standalone modules so Angular recognizes Material tags)
+    EditProjectDialogComponent,
+    EditTaskDialogComponent,
+    HttpClientModule,
+    // Angular Material
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule, // Added MatButtonModule for button functionality
+    MatIconModule,
+    MatSelectModule,
+    MatTooltipModule
+  ],
   providers: [Location,
     MsalService,
     MsalGuard,
@@ -111,6 +143,7 @@ imports: [
       multi: false,
       useClass: ConfigService
     },
+    RabbitMqLoggerService
   ],
   bootstrap: [AppComponent]
 })

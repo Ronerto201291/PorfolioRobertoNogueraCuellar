@@ -9,7 +9,8 @@ const PROXY_CONFIG = [
   {
     context: [
       "/api",
-      "/graphql"
+      "/graphql",
+      "/hc"
     ],
     target,
     secure: false,

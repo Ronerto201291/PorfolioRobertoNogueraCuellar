@@ -44,6 +44,12 @@ import { PortfolioTask } from '../../../services/portfolio.service';
                   title="Reabrir">
             ↩️
           </button>
+          <button mat-icon-button (click)="editTask.emit(task)" matTooltip="Editar" class="edit-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTask.emit(task)" matTooltip="Eliminar" class="delete-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -58,143 +64,134 @@ import { PortfolioTask } from '../../../services/portfolio.service';
       transition: all 0.2s ease;
       cursor: grab;
     }
-    
-    .task-card:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      transform: translateY(-1px);
-    }
-    
+
     .task-card.completed {
-      opacity: 0.7;
-      background: #fafafa;
+      background: #f8f9fa;
+      border-color: #28a745;
     }
-    
-    .task-card.completed .task-title {
-      text-decoration: line-through;
-      color: #888;
-    }
-    
+
     .task-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
-    
+
     .priority {
-      font-size: 0.75rem;
-      padding: 2px 8px;
+      font-size: 0.8rem;
+      padding: 2px 6px;
       border-radius: 4px;
+      font-weight: 500;
     }
-    
-    .priority-high { background: #ffe5e5; }
-    .priority-medium { background: #fff3e0; }
-    .priority-low { background: #e8f5e9; }
-    
+
+    .priority-low { background: #e3f2fd; color: #1976d2; }
+    .priority-medium { background: #fff3e0; color: #f57c00; }
+    .priority-high { background: #ffebee; color: #d32f2f; }
+
     .task-id {
       font-size: 0.7rem;
-      color: #aaa;
+      color: #666;
       font-family: monospace;
     }
-    
+
     .task-title {
-      margin: 0 0 8px 0;
+      margin: 0 0 6px 0;
       font-size: 0.9rem;
-      font-weight: 500;
-      color: #333;
-      line-height: 1.3;
+      font-weight: 600;
+      color: #1a1a2e;
     }
-    
+
     .task-description {
-      margin: 0 0 12px 0;
+      margin: 0 0 8px 0;
       font-size: 0.8rem;
       color: #666;
-      line-height: 1.4;
+      line-height: 1.3;
     }
-    
+
     .task-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .task-meta {
+      flex: 1;
+    }
+
+    .due-date {
       font-size: 0.75rem;
-      color: #888;
+      color: #666;
     }
-    
+
     .due-date.overdue {
-      color: #e53935;
+      color: #d32f2f;
+      font-weight: 500;
     }
-    
+
     .task-actions {
       display: flex;
       gap: 4px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    
-    .task-card:hover .task-actions {
-      opacity: 1;
-    }
-    
-    .action-btn {
-      width: 24px;
-      height: 24px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.7rem;
-      display: flex;
       align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
     }
-    
-    .action-btn.progress {
-      background: #e3f2fd;
+
+    .action-btn {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #f5f5f5;
+    }
+
+    .edit-btn, .delete-btn {
+      width: 32px;
+      height: 32px;
+    }
+
+    .edit-btn {
       color: #1976d2;
     }
-    
-    .action-btn.complete {
-      background: #e8f5e9;
-      color: #388e3c;
-    }
-    
-    .action-btn.reopen {
-      background: #fff3e0;
-      color: #f57c00;
-    }
-    
-    .action-btn:hover {
-      transform: scale(1.1);
+
+    .delete-btn {
+      color: #d32f2f;
     }
   `]
 })
 export class TaskCardComponent {
   @Input() task!: PortfolioTask;
-  @Output() statusChange = new EventEmitter<{ task: PortfolioTask; newStatus: string }>();
+  @Output() statusChanged = new EventEmitter<{ taskId: string; newStatus: string }>();
+  @Output() editTask = new EventEmitter<PortfolioTask>();
+  @Output() deleteTask = new EventEmitter<PortfolioTask>();
+
+  changeStatus(newStatus: string): void {
+    this.statusChanged.emit({ taskId: this.task.taskId, newStatus });
+  }
 
   getPriorityIcon(): string {
     switch (this.task.priority) {
-      case 'High': return '🔴 Alta';
-      case 'Medium': return '🟡 Media';
-      case 'Low': return '🟢 Baja';
-      default: return '⚪ Normal';
+      case 'High': return '🔴';
+      case 'Medium': return '🟡';
+      case 'Low': return '🟢';
+      default: return '⚪';
     }
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
   }
 
   isOverdue(): boolean {
     if (!this.task.dueDate) return false;
-    return new Date(this.task.dueDate) < new Date() && this.task.status !== 'Completed';
+    return new Date(this.task.dueDate) < new Date();
   }
 
-  changeStatus(newStatus: string): void {
-    this.statusChange.emit({ task: this.task, newStatus });
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', { 
+      day: '2-digit', 
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 }

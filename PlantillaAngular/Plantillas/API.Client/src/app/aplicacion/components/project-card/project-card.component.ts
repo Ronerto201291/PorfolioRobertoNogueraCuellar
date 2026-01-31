@@ -22,6 +22,14 @@ import { Project } from '../../../services/portfolio.service';
           </span>
         </div>
       </div>
+      <div class="project-actions">
+        <button mat-icon-button (click)="editProject.emit(project); $event.stopPropagation()" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteProject.emit(project); $event.stopPropagation()" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
   `,
   styles: [`
@@ -34,6 +42,7 @@ import { Project } from '../../../services/portfolio.service';
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
+      position: relative;
     }
     
     .project-card:hover {
@@ -93,12 +102,35 @@ import { Project } from '../../../services/portfolio.service';
     .stat-icon {
       font-size: 0.9rem;
     }
+
+    .project-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .project-card:hover .project-actions {
+      opacity: 1;
+    }
+
+    button.mat-icon-button {
+      padding: 8px;
+      border-radius: 50%;
+      transition: background 0.3s ease;
+    }
+
+    button.mat-icon-button:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
   `]
 })
 export class ProjectCardComponent {
   @Input() project!: Project;
   @Input() selected = false;
   @Output() selectProject = new EventEmitter<Project>();
+  @Output() editProject = new EventEmitter<Project>();
+  @Output() deleteProject = new EventEmitter<Project>();
 
   onSelect(): void {
     this.selectProject.emit(this.project);
