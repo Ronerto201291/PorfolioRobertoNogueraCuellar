@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { EventActivity } from '../aplicacion/components/rabbitmq-activity/rabbitmq-activity.component';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +20,10 @@ export class RabbitMqLoggerService {
     if (!this.isEnabled) return;
 
     this.subscription = interval(2000).pipe( // Check every 2 seconds
-      switchMap(() => this.http.get<any[]>('/api/activity?count=5')),
-      catchError(() => of([]))
+      switchMap(() => this.http.get<EventActivity[]>('/api/activity?count=5')),
+      catchError(() => of([] as EventActivity[]))
     ).subscribe(activities => {
-      if (activities.length > 0) {
+      if (activities && activities.length > 0) {
         const latestActivity = activities[0];
         if (latestActivity.eventId !== this.lastEventId) {
           this.logActivity(latestActivity);
@@ -33,7 +33,7 @@ export class RabbitMqLoggerService {
     });
   }
 
-  private logActivity(activity: any): void {
+  private logActivity(activity: EventActivity): void {
     const timestamp = new Date(activity.timestamp).toLocaleTimeString();
     const eventType = activity.eventType;
     const status = activity.status;
@@ -44,7 +44,7 @@ export class RabbitMqLoggerService {
     console.log(
       `%c[RabbitMQ] ${status} ${eventType} (EventId=${eventId})`,
       styles,
-      { timestamp, details: activity.details }
+      { timestamp, details: (activity as any).details }
     );
   }
 

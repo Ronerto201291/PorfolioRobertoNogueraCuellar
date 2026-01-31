@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { PortfolioTask } from '../../../services/portfolio.service';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-task-card',
@@ -26,30 +27,22 @@ import { PortfolioTask } from '../../../services/portfolio.service';
         </div>
         
         <div class="task-actions">
-          <button *ngIf="task.status !== 'InProgress'" 
-                  class="action-btn progress" 
-                  (click)="changeStatus('InProgress')"
-                  title="Mover a En Progreso">
-            ▶️
+          <button *ngIf="task.status !== 'InProgress'" mat-mini-fab color="accent" class="action-fab" aria-label="Mover a En Progreso" (click)="changeStatus('InProgress')" matTooltip="Mover a En Progreso">
+            <mat-icon>play_arrow</mat-icon>
           </button>
-          <button *ngIf="task.status !== 'Completed'" 
-                  class="action-btn complete" 
-                  (click)="changeStatus('Completed')"
-                  title="Marcar como Completada">
-            ✓
+          <button *ngIf="task.status !== 'Completed'" mat-mini-fab color="primary" class="action-fab" aria-label="Marcar como Completada" (click)="changeStatus('Completed')" matTooltip="Marcar como Completada">
+            <mat-icon>check</mat-icon>
           </button>
-          <button *ngIf="task.status === 'Completed'" 
-                  class="action-btn reopen" 
-                  (click)="changeStatus('Pending')"
-                  title="Reabrir">
-            ↩️
+          <button *ngIf="task.status === 'Completed'" mat-mini-fab color="warn" class="action-fab" aria-label="Reabrir" (click)="changeStatus('Pending')" matTooltip="Reabrir tarea">
+            <mat-icon>undo</mat-icon>
           </button>
-          <button mat-icon-button (click)="editTask.emit(task)" matTooltip="Editar" class="edit-btn">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteTask.emit(task)" matTooltip="Eliminar" class="delete-btn">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <!-- Ionic style buttons (recommended) -->
+          <ion-button fill="clear" size="small" (click)="onEdit($event)" aria-label="Editar tarea" class="edit-btn">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="onDelete($event)" aria-label="Eliminar tarea" class="delete-btn">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
         </div>
       </div>
     </div>
@@ -130,8 +123,9 @@ import { PortfolioTask } from '../../../services/portfolio.service';
 
     .task-actions {
       display: flex;
-      gap: 4px;
-      align-items: center;
+      gap: 8px;
+      align-items: center !important; /* prevent stretch from parent flex */
+      align-self: center;
     }
 
     .action-btn {
@@ -143,24 +137,21 @@ import { PortfolioTask } from '../../../services/portfolio.service';
       border-radius: 4px;
       transition: background 0.2s ease;
     }
+    .action-fab { box-shadow: none; height:32px; width:32px; min-width:32px; align-self:center }
+    button.mat-mini-fab { box-shadow: none; align-self:center }
 
-    .action-btn:hover {
-      background: #f5f5f5;
-    }
+    .action-fab:hover, button.mat-mini-fab:hover { transform: translateY(-2px); }
 
-    .edit-btn, .delete-btn {
-      width: 32px;
-      height: 32px;
-    }
+    .edit-btn, .delete-btn { width: 36px; height: 36px; align-self:center }
+    .edit-btn mat-icon { color: #1976d2; }
+    .delete-btn mat-icon { color: #d32f2f; }
 
-    .edit-btn {
-      color: #1976d2;
-    }
-
-    .delete-btn {
-      color: #d32f2f;
-    }
+    /* Ensure native buttons inside task-actions don't stretch */
+    .task-actions button, .task-actions ion-button { align-self: center; }
   `]
+  ,
+  standalone: true,
+  imports: [IonicModule]
 })
 export class TaskCardComponent {
   @Input() task!: PortfolioTask;
@@ -170,6 +161,16 @@ export class TaskCardComponent {
 
   changeStatus(newStatus: string): void {
     this.statusChanged.emit({ taskId: this.task.taskId, newStatus });
+  }
+
+  onEdit(evt: Event): void {
+    evt.stopPropagation();
+    this.editTask.emit(this.task);
+  }
+
+  onDelete(evt: Event): void {
+    evt.stopPropagation();
+    this.deleteTask.emit(this.task);
   }
 
   getPriorityIcon(): string {

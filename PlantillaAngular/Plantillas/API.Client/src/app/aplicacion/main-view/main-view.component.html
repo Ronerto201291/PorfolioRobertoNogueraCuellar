@@ -32,13 +32,15 @@
   </header>
 
   <!-- Notifications -->
-  <div class="notifications">
+    <div class="notifications">
     <div *ngIf="successMessage()" class="notification success">
       <span>✓</span> {{ successMessage() }}
     </div>
     <div *ngIf="errorMessage()" class="notification error">
       <span>⚠️</span> {{ errorMessage() }}
-      <button (click)="errorMessage.set(null)" class="close-btn">×</button>
+      <ion-button fill="clear" size="small" class="close-btn" (click)="errorMessage.set(null)" aria-label="Cerrar error">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
     </div>
     <div *ngIf="isUpdating()" class="notification updating">
       <span class="spinner"></span> Actualizando...
@@ -57,9 +59,14 @@
     <aside class="projects-sidebar">
       <div class="sidebar-header">
         <h2>📁 Proyectos</h2>
-        <div class="sidebar-actions">
-          <button class="add-btn" (click)="openCreateProjectDialog()" title="Nuevo proyecto">➕</button>
-          <button class="refresh-btn" (click)="loadProjects()" title="Actualizar">🔄</button>
+      <div class="sidebar-actions">
+          <ion-button fill="solid" color="primary" class="add-btn" (click)="openCreateProjectDialog()" aria-label="Nuevo proyecto">
+            <ion-icon slot="start" name="add-outline"></ion-icon>
+            <span class="btn-label">Nuevo</span>
+          </ion-button>
+          <ion-button fill="clear" class="refresh-btn" (click)="loadProjects()" aria-label="Actualizar">
+            <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+          </ion-button>
         </div>
       </div>
       
@@ -77,9 +84,10 @@
           <span class="empty-icon">📭</span>
           <p>No se encontraron proyectos</p>
           <small>Haz clic en ➕ para crear uno nuevo</small>
-          <button class="create-first-btn" (click)="openCreateProjectDialog()">
-            ➕ Crear primer proyecto
-          </button>
+          <ion-button class="create-first-btn" fill="solid" color="primary" (click)="openCreateProjectDialog()">
+            <ion-icon slot="start" name="add-outline"></ion-icon>
+            Crear primer proyecto
+          </ion-button>
         </div>
       </div>
     </aside>
@@ -92,10 +100,10 @@
           <p>{{ selectedProject()?.description }}</p>
         </div>
         <div class="project-actions">
-          <button mat-flat-button color="primary" (click)="openCreateTaskDialog(selectedProject()!)">
-            <mat-icon>add</mat-icon>
+          <ion-button fill="solid" color="primary" (click)="openCreateTaskDialog(selectedProject()!)">
+            <ion-icon slot="start" name="add-outline"></ion-icon>
             Nueva Tarea
-          </button>
+          </ion-button>
         </div>
       </div>
       
@@ -120,7 +128,9 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>➕ Nuevo Proyecto</h2>
-      <button class="modal-close" (click)="closeCreateModal()">×</button>
+      <ion-button fill="clear" class="modal-close" (click)="closeCreateModal()" aria-label="Cerrar modal">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
     </div>
     
     <div class="modal-body">
@@ -149,13 +159,13 @@
     </div>
     
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeCreateModal()" [disabled]="isCreating()">
+      <ion-button fill="clear" class="btn-cancel" (click)="closeCreateModal()" [disabled]="isCreating()">
         Cancelar
-      </button>
-      <button class="btn-create" (click)="createProject()" [disabled]="isCreating() || !newProjectName.trim()">
+      </ion-button>
+      <ion-button fill="solid" class="btn-create" (click)="createProject()" [disabled]="isCreating() || !newProjectName.trim()">
         <span *ngIf="isCreating()" class="spinner-small"></span>
         {{ isCreating() ? 'Creando...' : 'Crear Proyecto' }}
-      </button>
+      </ion-button>
     </div>
   </div>
 </div>

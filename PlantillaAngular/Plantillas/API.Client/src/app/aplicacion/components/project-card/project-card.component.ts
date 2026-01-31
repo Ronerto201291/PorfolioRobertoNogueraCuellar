@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
 import { Project } from '../../../services/portfolio.service';
 
 @Component({
@@ -8,9 +10,9 @@ import { Project } from '../../../services/portfolio.service';
          [class.selected]="selected"
          (click)="onSelect()">
       <div class="project-icon">📁</div>
-      <div class="project-info">
+        <div class="project-info">
         <h3>{{ project.name }}</h3>
-        <p class="description">{{ (project.description || '') | slice:0:80 }}{{ (project.description?.length || 0) > 80 ? '...' : '' }}</p>
+        <p class="description">{{ project.description ? (project.description | slice:0:80) : '' }}{{ (project.description?.length || 0) > 80 ? '...' : '' }}</p>
         <div class="project-stats">
           <span class="stat">
             <span class="stat-icon">📝</span>
@@ -23,12 +25,12 @@ import { Project } from '../../../services/portfolio.service';
         </div>
       </div>
       <div class="project-actions">
-        <button mat-icon-button (click)="editProject.emit(project); $event.stopPropagation()" matTooltip="Editar">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteProject.emit(project); $event.stopPropagation()" matTooltip="Eliminar">
-          <mat-icon>delete</mat-icon>
-        </button>
+        <ion-button fill="clear" size="small" (click)="onEdit($event)" aria-label="Editar proyecto">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" color="danger" (click)="onDelete($event)" aria-label="Eliminar proyecto">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
       </div>
     </div>
   `,
@@ -105,25 +107,24 @@ import { Project } from '../../../services/portfolio.service';
 
     .project-actions {
       display: flex;
-      gap: 4px;
+      gap: 8px;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      transform: translateY(-4px);
+      align-items: center; /* prevent children stretch */
     }
 
     .project-card:hover .project-actions {
       opacity: 1;
+      transform: translateY(0);
     }
 
-    button.mat-icon-button {
-      padding: 8px;
-      border-radius: 50%;
-      transition: background 0.3s ease;
-    }
-
-    button.mat-icon-button:hover {
-      background: rgba(102, 126, 234, 0.1);
-    }
+    button.mat-icon-button { padding: 6px; border-radius: 8px; }
+    button.mat-icon-button:hover { background: rgba(0,0,0,0.04); }
   `]
+  ,
+  standalone: true,
+  imports: [CommonModule, IonicModule]
 })
 export class ProjectCardComponent {
   @Input() project!: Project;
@@ -134,6 +135,16 @@ export class ProjectCardComponent {
 
   onSelect(): void {
     this.selectProject.emit(this.project);
+  }
+
+  onEdit(evt: Event): void {
+    evt.stopPropagation();
+    this.editProject.emit(this.project);
+  }
+
+  onDelete(evt: Event): void {
+    evt.stopPropagation();
+    this.deleteProject.emit(this.project);
   }
 
   getCompletedCount(): number {

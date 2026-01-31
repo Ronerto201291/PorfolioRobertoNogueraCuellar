@@ -211,29 +211,9 @@
   gap: 4px;
 }
 
-.add-btn, .refresh-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.add-btn:hover, .refresh-btn:hover {
-  background: #f0f0f0;
-}
-
-.add-btn {
-  background: #667eea;
-  color: white;
-  border-radius: 6px;
-}
-
-.add-btn:hover {
-  background: #5a6fd6;
-}
+.add-btn { display:flex; align-items:center; gap:8px }
+.add-btn .btn-label { margin-left:4px }
+.refresh-btn { height:36px }
 
 .projects-list {
   flex: 1;
@@ -267,21 +247,7 @@
   margin-bottom: 16px;
 }
 
-.create-first-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.create-first-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
+.create-first-btn { display:flex; align-items:center; gap:8px }
 
 // ===== KANBAN SECTION =====
 .kanban-section {

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, signal } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { PortfolioService, Project, PortfolioTask } from '../../services/portfolio.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,7 +10,9 @@ import { EditTaskDialogComponent, TaskDialogData } from '../components/edit-task
 @Component({
   selector: 'app-main-view',
   templateUrl: './main-view.component.html',
-  styleUrls: ['./main-view.component.scss']
+  styleUrls: ['./main-view.component.scss'],
+  standalone: true,
+  imports: [IonicModule]
 })
 export class MainViewComponent implements OnInit {
 

@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import "primeng/resources/themes/md-light-indigo/theme.css";
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "primeng/resources/primeng.css";
@@ -10,6 +11,24 @@
 * {
   font-family: var(--ion-font-family);
 }
+
+/* App-wide Material-like buttons to keep consistent look */
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.app-btn-icon { width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center }
+
+.app-action-fab { height:32px; width:32px; min-width:32px; }
+
+/* Make mat-form-field clicks safer when mat-inputs are used in custom templates */
+mat-form-field { width: 100%; }
 
 p-button {
   span {

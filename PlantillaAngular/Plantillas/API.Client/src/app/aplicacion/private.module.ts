@@ -14,6 +14,7 @@ import {
 import { InteractionType } from '@azure/msal-browser';
 import { TableModule } from 'primeng/table';
 import { MatIconModule } from '@angular/material/icon';
+import { IonicModule } from '@ionic/angular';
 
 // Importación corregida con 'M' mayúscula para resolver el error TS2724
 import { loginRequest } from '../../environments/auth-config';
@@ -38,11 +39,8 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 
 @NgModule({
   declarations: [
-    MainViewComponent,
     LoginComponent,
     LoggedinComponent,
-    ProjectCardComponent,
-    TaskCardComponent,
     KanbanBoardComponent
   ],
   imports: [
@@ -53,7 +51,12 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
     TableModule,
     MsalModule,
     MatIconModule,
-    RouterModule.forChild(privateRoutes)
+    IonicModule,
+    RouterModule.forChild(privateRoutes),
+    // Standalone components must be imported, not declared
+    MainViewComponent,
+    ProjectCardComponent,
+    TaskCardComponent
   ],
   providers: [
     {
