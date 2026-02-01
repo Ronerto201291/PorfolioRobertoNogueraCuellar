@@ -22,7 +22,7 @@ namespace PruebaAngular.Infrastructure.Messaging
         private readonly IChannel _channel;
         private readonly ILogger<RabbitMqEventBus> _logger;
         private readonly ConcurrentQueue<EventActivity> _activityLog;
-        private const string ExchangeName = "portfolio-events";
+        private const string ExchangeName = "activity.events";
         private const int MaxActivityLogSize = 100;
 
         public RabbitMqEventBus(
@@ -34,7 +34,6 @@ namespace PruebaAngular.Infrastructure.Messaging
             _logger = logger;
             _activityLog = new ConcurrentQueue<EventActivity>();
 
-            // Declarar exchange de tipo fanout para broadcast de eventos
             _channel.ExchangeDeclareAsync(
                 exchange: ExchangeName,
                 type: ExchangeType.Topic,
@@ -44,9 +43,6 @@ namespace PruebaAngular.Infrastructure.Messaging
             _logger.LogInformation("[RabbitMQ] EventBus inicializado. Exchange: {Exchange}", ExchangeName);
         }
 
-        /// <summary>
-        /// Publica un evento de dominio en RabbitMQ.
-        /// </summary>
         public async Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken = default)
             where TEvent : IDomainEvent
         {
@@ -75,13 +71,11 @@ namespace PruebaAngular.Infrastructure.Messaging
                     body: body,
                     cancellationToken: cancellationToken);
 
-                // Log estructurado para Aspire
                 _logger.LogInformation(
                     "[RabbitMQ] Published {EventType} (EventId={EventId})",
                     domainEvent.EventType,
                     domainEvent.EventId);
 
-                // Registrar actividad
                 RecordActivity(new EventActivity
                 {
                     EventId = domainEvent.EventId,
@@ -112,9 +106,6 @@ namespace PruebaAngular.Infrastructure.Messaging
             }
         }
 
-        /// <summary>
-        /// Obtiene el historial reciente de actividad.
-        /// </summary>
         public IReadOnlyList<EventActivity> GetRecentActivity(int count = 50)
         {
             return _activityLog.TakeLast(count).Reverse().ToList();

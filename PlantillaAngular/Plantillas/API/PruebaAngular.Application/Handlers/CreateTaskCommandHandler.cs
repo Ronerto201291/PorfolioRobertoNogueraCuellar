@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PruebaAngular.Application.Commands;
 using PruebaAngular.Domain.AggregateModels.Portfolio;
 using PruebaAngular.Infrastructure.Data;
+using PruebaAngular.Domain.Events;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,13 +19,16 @@ namespace PruebaAngular.Application.Handlers
     {
         private readonly PruebaAngularContext _context;
         private readonly ILogger<CreateTaskCommandHandler> _logger;
+        private readonly IEventBus? _eventBus;
 
         public CreateTaskCommandHandler(
             PruebaAngularContext context,
-            ILogger<CreateTaskCommandHandler> logger)
+            ILogger<CreateTaskCommandHandler> logger,
+            IEventBus? eventBus = null)
         {
             _context = context;
             _logger = logger;
+            _eventBus = eventBus;
         }
 
         public async Task<CreateTaskResult> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
@@ -43,7 +47,6 @@ namespace PruebaAngular.Application.Handlers
                     return CreateTaskResult.Fail("El título no puede exceder 200 caracteres");
                 }
 
-                // Verificar que el proyecto existe
                 var project = await _context.Projects.FindAsync(
                     new object[] { request.ProjectId }, 
                     cancellationToken);
@@ -54,21 +57,18 @@ namespace PruebaAngular.Application.Handlers
                     return CreateTaskResult.ProjectNotFound(request.ProjectId);
                 }
 
-                // Validar status
                 var validStatuses = new[] { "Pending", "InProgress", "Completed" };
                 if (!Array.Exists(validStatuses, s => s == request.Status))
                 {
                     return CreateTaskResult.Fail($"Estado inválido. Valores permitidos: {string.Join(", ", validStatuses)}");
                 }
 
-                // Validar priority
                 var validPriorities = new[] { "Low", "Medium", "High" };
                 if (!Array.Exists(validPriorities, p => p == request.Priority))
                 {
                     return CreateTaskResult.Fail($"Prioridad inválida. Valores permitidos: {string.Join(", ", validPriorities)}");
                 }
 
-                // Crear la tarea usando el factory method del dominio
                 var task = PortfolioTask.Create(
                     projectId: request.ProjectId,
                     title: request.Title.Trim(),
@@ -84,6 +84,15 @@ namespace PruebaAngular.Application.Handlers
                 _logger.LogInformation(
                     "Tarea creada exitosamente: {TaskId} - {Title} en proyecto {ProjectId}",
                     task.TaskId, task.Title, task.ProjectId);
+
+                if (_eventBus != null)
+                {
+                    await _eventBus.PublishAsync(new ActivityEvent("TaskCreated")
+                    {
+                        EntityId = task.TaskId.ToString(),
+                        EntityName = task.Title
+                    }, cancellationToken);
+                }
 
                 return CreateTaskResult.Ok(
                     task.TaskId, task.ProjectId, task.Title, task.Description,

@@ -7,10 +7,6 @@ using RabbitMQ.Client;
 
 namespace PruebaAngular.Infrastructure.Messaging
 {
-    /// <summary>
-    /// Health check para verificar la conexión a RabbitMQ.
-    /// Visible automáticamente en Aspire Dashboard.
-    /// </summary>
     public class RabbitMqHealthCheck : IHealthCheck
     {
         private readonly IConnection _connection;
@@ -49,9 +45,6 @@ namespace PruebaAngular.Infrastructure.Messaging
         }
     }
 
-    /// <summary>
-    /// Health check para verificar que el consumer está activo.
-    /// </summary>
     public class RabbitMqConsumerHealthCheck : IHealthCheck
     {
         private readonly RabbitMqEventConsumer _consumer;
@@ -65,8 +58,6 @@ namespace PruebaAngular.Infrastructure.Messaging
             HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
-            // El consumer hereda de BackgroundService, verificamos si está ejecutándose
-            // mediante la comprobación de que el servicio fue iniciado correctamente
             try
             {
                 return Task.FromResult(HealthCheckResult.Healthy(

@@ -48,13 +48,11 @@ namespace PruebaAngular.Application.Handlers
                     return CreateProjectResult.Fail("El nombre del proyecto no puede exceder 200 caracteres");
                 }
 
-                // Crear el proyecto usando el factory method del dominio
                 var project = Project.Create(
                     name: request.Name.Trim(),
                     description: request.Description?.Trim()
                 );
 
-                // Persistir en base de datos
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync(cancellationToken);
 
@@ -63,13 +61,12 @@ namespace PruebaAngular.Application.Handlers
                     project.ProjectId,
                     project.Name);
 
-                // Publicar evento en RabbitMQ
                 if (_eventBus != null)
                 {
-                    await _eventBus.PublishAsync(new ProjectCreatedEvent
+                    await _eventBus.PublishAsync(new ActivityEvent("ProjectCreated")
                     {
-                        ProjectId = project.ProjectId,
-                        ProjectName = project.Name
+                        EntityId = project.ProjectId.ToString(),
+                        EntityName = project.Name
                     }, cancellationToken);
                 }
 

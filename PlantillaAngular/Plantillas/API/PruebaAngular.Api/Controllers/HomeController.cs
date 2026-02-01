@@ -7,9 +7,6 @@ using System;
 
 namespace PruebaAngular.Api.Controllers
 {
-    /// <summary>
-    /// Controller con ejemplos varios.
-    /// </summary>
     [AllowAnonymous]
     public class HomeController : Controller
     {
@@ -23,7 +20,6 @@ namespace PruebaAngular.Api.Controllers
 
             _logger = logger;
         }
-        // GET: /<controller>/
         public IActionResult Index()
         {
 

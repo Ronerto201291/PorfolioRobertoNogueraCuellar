@@ -70,9 +70,7 @@ export class EditTaskDialogComponent {
   save(): void {
     if (!(this.data.title || '').trim()) return;
     this._isSubmitting.set(true);
-    // Close immediately with data; parent handles persistence
     this.dialogRef.close(this.data);
-    // reset submission state in case dialog reopened (safe guard)
     setTimeout(() => this._isSubmitting.set(false), 500);
   }
 }

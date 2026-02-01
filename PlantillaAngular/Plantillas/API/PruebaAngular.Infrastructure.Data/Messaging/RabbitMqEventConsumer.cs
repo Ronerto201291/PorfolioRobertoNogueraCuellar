@@ -11,17 +11,13 @@ using RabbitMQ.Client.Events;
 
 namespace PruebaAngular.Infrastructure.Messaging
 {
-    /// <summary>
-    /// Background service que consume eventos de RabbitMQ.
-    /// Los logs son visibles en tiempo real desde Aspire.
-    /// </summary>
     public class RabbitMqEventConsumer : BackgroundService
     {
         private readonly IConnection _connection;
         private readonly ILogger<RabbitMqEventConsumer> _logger;
         private IChannel? _channel;
-        private const string ExchangeName = "portfolio-events";
-        private const string QueueName = "portfolio-events-consumer";
+        private const string ExchangeName = "activity.events";
+        private const string QueueName = "activity.events";
 
         public RabbitMqEventConsumer(
             IConnection connection,
@@ -39,7 +35,6 @@ namespace PruebaAngular.Infrastructure.Messaging
             {
                 _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
 
-                // Declarar exchange
                 await _channel.ExchangeDeclareAsync(
                     exchange: ExchangeName,
                     type: ExchangeType.Topic,
@@ -47,7 +42,6 @@ namespace PruebaAngular.Infrastructure.Messaging
                     autoDelete: false,
                     cancellationToken: stoppingToken);
 
-                // Declarar cola
                 await _channel.QueueDeclareAsync(
                     queue: QueueName,
                     durable: true,
@@ -55,7 +49,6 @@ namespace PruebaAngular.Infrastructure.Messaging
                     autoDelete: false,
                     cancellationToken: stoppingToken);
 
-                // Bind a todos los eventos (#)
                 await _channel.QueueBindAsync(
                     queue: QueueName,
                     exchange: ExchangeName,
@@ -76,7 +69,6 @@ namespace PruebaAngular.Infrastructure.Messaging
 
                 _logger.LogInformation("[RabbitMQ] Consumer escuchando en cola: {Queue}", QueueName);
 
-                // Mantener el servicio corriendo
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
             catch (OperationCanceledException)
@@ -98,23 +90,19 @@ namespace PruebaAngular.Infrastructure.Messaging
                 var routingKey = args.RoutingKey;
                 var messageId = args.BasicProperties.MessageId ?? "unknown";
 
-                // Log estructurado para Aspire
-                _logger.LogInformation(
-                    "[RabbitMQ] Consumed {EventType} (EventId={EventId})",
-                    routingKey,
-                    messageId);
-
-                // Parsear el evento para obtener detalles
                 using var doc = JsonDocument.Parse(message);
-                if (doc.RootElement.TryGetProperty("eventType", out var eventType))
-                {
-                    _logger.LogDebug(
-                        "[RabbitMQ] Event details - Type: {EventType}, Body: {Body}",
-                        eventType.GetString(),
-                        message);
-                }
+                var eventType = doc.RootElement.TryGetProperty("eventType", out var eventTypeProp)
+                    ? eventTypeProp.GetString()
+                    : routingKey;
+                var entityName = doc.RootElement.TryGetProperty("entityName", out var entityNameProp)
+                    ? entityNameProp.GetString()
+                    : null;
 
-                // ACK del mensaje
+                _logger.LogInformation(
+                    "[Activity] {EventType} - {EntityName}",
+                    eventType,
+                    string.IsNullOrWhiteSpace(entityName) ? "(sin nombre)" : entityName);
+
                 if (_channel != null)
                 {
                     await _channel.BasicAckAsync(args.DeliveryTag, multiple: false);
@@ -126,7 +114,6 @@ namespace PruebaAngular.Infrastructure.Messaging
                     "[RabbitMQ] Error processing message: {Error}",
                     ex.Message);
 
-                // NACK y requeue
                 if (_channel != null)
                 {
                     await _channel.BasicNackAsync(args.DeliveryTag, multiple: false, requeue: true);

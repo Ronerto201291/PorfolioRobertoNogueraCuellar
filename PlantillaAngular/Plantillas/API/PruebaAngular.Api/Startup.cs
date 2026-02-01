@@ -131,15 +131,6 @@ namespace PruebaAngular.Api
             services.AddScoped<HttpGlobalExceptionFilter>();
             services.AddHttpClient();
 
-            ////HACK: Servicio en segundo plano
-            //services.AddHostedService<QueuedHostedService>(factory =>
-            //{
-            //    return factory.GetRequiredService<QueuedHostedService>();
-            //});
-            
-
-            //return new AutofacServiceProvider(container.Build());
-
         }
 
         // ConfigureContainer is where you can register things directly
@@ -224,7 +215,6 @@ namespace PruebaAngular.Api
 
             ConfigureAuth(app);
            
-            //app.UseMvcWithDefaultRoute();
             if (_env.EnvironmentName != "Production")
             {
                 app.UseSwagger(c =>
@@ -245,27 +235,11 @@ namespace PruebaAngular.Api
 
             }
 
-            // para acceder a la ip cliente del request
-            // usado en el token
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor |
                 ForwardedHeaders.XForwardedProto
             });
-
-            ////Servicio en segundo plano
-            ////registrado el servicio de cola, lo obtenemos
-            //var queueSvc = app.ApplicationServices.GetRequiredService<QueuedHostedService>();
-
-            //// y lo iniciamos. Importante: el AppService debe configurarse como "Siempre activo"
-            //queueSvc.StartAsync(new System.Threading.CancellationToken());
-
-            //app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping.Register(() =>
-            //{
-            //    // Detener el procesamiento de mensajes aqu�
-            //    _logger.LogInformation($"PruebaAngular {GetType()} ApplicationStopping... Deteniendo servicio RequestHostedService");
-            //    queueSvc.StopAsync(new System.Threading.CancellationToken()).Wait();
-            //});
         }
 
         protected virtual void ConfigureAuth(IApplicationBuilder app)
@@ -289,7 +263,6 @@ namespace PruebaAngular.Api
                     endpoints.MapDefaultControllerRoute()
                         .RequireAuthorization(_RequireAuthenticatedUserPolicy);
                     
-                    // GraphQL endpoint
                     endpoints.MapGraphQL("/graphql/portfolio");
                 });
             }
@@ -306,16 +279,11 @@ namespace PruebaAngular.Api
                         .AllowCredentials();
                     });
                     
-                    // GraphQL endpoint
                     endpoints.MapGraphQL("/graphql/portfolio");
                 });
             }
         }
 
-        /// <summary>
-        /// Inicializa la base de datos automáticamente al arrancar (solo en desarrollo).
-        /// Crea las tablas y siembra datos si no existen.
-        /// </summary>
         private async Task InitializeDatabaseAsync(IApplicationBuilder app)
         {
             try
@@ -323,7 +291,6 @@ namespace PruebaAngular.Api
                 using var scope = app.ApplicationServices.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<PruebaAngularContext>();
 
-                // Esperar a que PostgreSQL esté listo
                 var maxRetries = 10;
                 for (int i = 0; i < maxRetries; i++)
                 {
@@ -341,11 +308,9 @@ namespace PruebaAngular.Api
                     }
                 }
 
-                // Crear tablas
                 await context.Database.ExecuteSqlRawAsync(Infrastructure.Data.Queries.DatabaseSetupQueries.CreateTables);
                 _logger.LogInformation("✅ Tablas de base de datos verificadas/creadas");
 
-                // Verificar si hay datos
                 var hasData = await context.Projects.AnyAsync();
                 if (!hasData)
                 {

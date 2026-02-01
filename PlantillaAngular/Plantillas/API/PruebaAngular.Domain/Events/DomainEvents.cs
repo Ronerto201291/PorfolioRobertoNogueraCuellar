@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 
 namespace PruebaAngular.Domain.Events
 {
-    /// <summary>
-    /// Interfaz base para todos los eventos de dominio.
-    /// </summary>
     public interface IDomainEvent
     {
         Guid EventId { get; }
@@ -15,9 +12,6 @@ namespace PruebaAngular.Domain.Events
         string EventType { get; }
     }
 
-    /// <summary>
-    /// Clase base abstracta para eventos de dominio.
-    /// </summary>
     public abstract class DomainEvent : IDomainEvent
     {
         public Guid EventId { get; } = Guid.NewGuid();
@@ -25,9 +19,6 @@ namespace PruebaAngular.Domain.Events
         public abstract string EventType { get; }
     }
 
-    /// <summary>
-    /// Evento emitido cuando se crea un proyecto.
-    /// </summary>
     public class ProjectCreatedEvent : DomainEvent
     {
         public override string EventType => nameof(ProjectCreatedEvent);
@@ -35,9 +26,6 @@ namespace PruebaAngular.Domain.Events
         public string ProjectName { get; init; } = string.Empty;
     }
 
-    /// <summary>
-    /// Evento emitido cuando se actualiza un proyecto.
-    /// </summary>
     public class ProjectUpdatedEvent : DomainEvent
     {
         public override string EventType => nameof(ProjectUpdatedEvent);
@@ -45,18 +33,12 @@ namespace PruebaAngular.Domain.Events
         public string ProjectName { get; init; } = string.Empty;
     }
 
-    /// <summary>
-    /// Evento emitido cuando se elimina un proyecto.
-    /// </summary>
     public class ProjectDeletedEvent : DomainEvent
     {
         public override string EventType => nameof(ProjectDeletedEvent);
         public Guid ProjectId { get; init; }
     }
 
-    /// <summary>
-    /// Evento emitido cuando se crea una tarea.
-    /// </summary>
     public class TaskCreatedEvent : DomainEvent
     {
         public override string EventType => nameof(TaskCreatedEvent);
@@ -65,9 +47,6 @@ namespace PruebaAngular.Domain.Events
         public string TaskTitle { get; init; } = string.Empty;
     }
 
-    /// <summary>
-    /// Evento emitido cuando se actualiza una tarea.
-    /// </summary>
     public class TaskUpdatedEvent : DomainEvent
     {
         public override string EventType => nameof(TaskUpdatedEvent);
@@ -76,18 +55,29 @@ namespace PruebaAngular.Domain.Events
         public string NewStatus { get; init; } = string.Empty;
     }
 
-    /// <summary>
-    /// Evento emitido cuando se elimina una tarea.
-    /// </summary>
     public class TaskDeletedEvent : DomainEvent
     {
         public override string EventType => nameof(TaskDeletedEvent);
         public Guid TaskId { get; init; }
     }
 
-    /// <summary>
-    /// Representa una actividad de evento (publicado o consumido).
-    /// </summary>
+    public class ActivityEvent : DomainEvent
+    {
+        private readonly string _eventType;
+
+        public ActivityEvent(string eventType)
+        {
+            _eventType = eventType;
+        }
+
+        public override string EventType => _eventType;
+
+        public string EntityId { get; init; } = string.Empty;
+        public string EntityName { get; init; } = string.Empty;
+
+        public DateTimeOffset Timestamp => OccurredAt;
+    }
+
     public class EventActivity
     {
         public Guid EventId { get; init; }
@@ -104,9 +94,6 @@ namespace PruebaAngular.Domain.Events
         Failed
     }
 
-    /// <summary>
-    /// Interfaz para el bus de eventos.
-    /// </summary>
     public interface IEventBus
     {
         Task PublishAsync<TEvent>(TEvent domainEvent, CancellationToken cancellationToken = default)
