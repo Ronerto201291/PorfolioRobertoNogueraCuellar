@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PruebaAngular.Application.Commands;
+using PruebaAngular.Application.DTO.Requests;
+using PruebaAngular.Application.Queries;
 
 namespace PruebaAngular.Api.Controllers
 {
@@ -11,30 +11,22 @@ namespace PruebaAngular.Api.Controllers
     [Route("api/[controller]")]
     public class NotificationsController : ControllerBase
     {
-        // NOTE: persistence is handled via EF Core through MediatR handler.
-        // The in-memory store was removed in favor of DB-backed subscribers.
-
-        public class SubscribeRequest
-        {
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; } = string.Empty;
-        }
-
         [HttpPost("subscribe")]
-        public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest request, [FromServices] IMediator mediator)
+        public async Task<IActionResult> Subscribe([FromBody] SubscribeNotificationRequest request, [FromServices] IMediator mediator)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await mediator.Send(new PruebaAngular.Application.Commands.SubscribeNotificationCommand { Email = request.Email });
+            var result = await mediator.Send(new SubscribeNotificationCommand { Email = request.Email });
 
             if (!result.Success)
             {
                 if (result.Message?.Contains("already") == true)
+                {
                     return Conflict(new { message = result.Message });
+                }
 
                 return BadRequest(new { message = result.Message });
             }
@@ -43,11 +35,9 @@ namespace PruebaAngular.Api.Controllers
         }
 
         [HttpGet("subscribers")]
-        public async Task<IActionResult> GetSubscribers([FromServices] PruebaAngularContext db)
+        public async Task<IActionResult> GetSubscribers([FromServices] IMediator mediator)
         {
-            var list = await db.Set<PruebaAngular.Domain.AggregateModels.NotificationSubscriber>()
-                .Select(s => s.Email)
-                .ToArrayAsync();
+            var list = await mediator.Send(new GetNotificationSubscribersQuery());
             return Ok(list);
         }
     }

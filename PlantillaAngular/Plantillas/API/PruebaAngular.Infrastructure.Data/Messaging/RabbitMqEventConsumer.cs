@@ -114,8 +114,6 @@ namespace PruebaAngular.Infrastructure.Messaging
 
                 _logger.LogInformation("[Consumer] Listening Queue={Queue}", QueueName);
 
-                // The UI may show low message counts because this consumer ACKs immediately after processing.
-                // In real-time scenarios, messages are pulled and acknowledged quickly, so queues remain near-empty.
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }

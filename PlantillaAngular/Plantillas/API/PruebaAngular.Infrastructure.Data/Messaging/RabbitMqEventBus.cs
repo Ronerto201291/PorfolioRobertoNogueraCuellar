@@ -12,10 +12,6 @@ using RabbitMQ.Client;
 
 namespace PruebaAngular.Infrastructure.Messaging
 {
-    /// <summary>
-    /// Implementación del Event Bus usando RabbitMQ.
-    /// Incluye logs estructurados para visibilidad en Aspire.
-    /// </summary>
     public class RabbitMqEventBus : IEventBus, IDisposable
     {
         private readonly IConnection _connection;
@@ -124,7 +120,6 @@ namespace PruebaAngular.Infrastructure.Messaging
         {
             _activityLog.Enqueue(activity);
 
-            // Limitar tamaño del log
             while (_activityLog.Count > MaxActivityLogSize)
             {
                 _activityLog.TryDequeue(out _);

@@ -25,16 +25,14 @@ namespace PruebaAngular.Infrastructure.Data
             System.Diagnostics.Debug.WriteLine("PruebaAngularDbContext::ctor ->" + GetHashCode());
         }
 
-        // Portfolio aggregate
         public DbSet<Project> Projects { get; set; }
         public DbSet<PortfolioTask> Tasks { get; set; }
+        public DbSet<NotificationSubscriber> NotificationSubscribers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Set default schema to public for PostgreSQL
             modelBuilder.HasDefaultSchema("public");
 
-            // Apply entity configurations
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new PortfolioTaskConfiguration());
 

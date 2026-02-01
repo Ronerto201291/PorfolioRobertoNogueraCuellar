@@ -15,6 +15,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\PruebaAngular.Application.DTO\PruebaAngular.Application.DTO.csproj" />
+    <ProjectReference Include="..\PruebaAngular.Domain\PruebaAngular.Domain.csproj" />
     <ProjectReference Include="..\PruebaAngular.Infrastructure.Data\PruebaAngular.Infrastructure.Data.csproj" />
   </ItemGroup>
   

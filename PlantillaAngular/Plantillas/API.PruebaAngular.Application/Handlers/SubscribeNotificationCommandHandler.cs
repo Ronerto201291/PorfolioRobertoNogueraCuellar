@@ -36,7 +36,6 @@ namespace PruebaAngular.Application.Handlers
             _db.Add(subscriber);
             await _db.SaveChangesAsync(cancellationToken);
 
-            // Publish domain event for subscribers
             var ev = new NotificationSubscribedEvent { SubscriberId = subscriber.SubscriberId, Email = subscriber.Email };
             await _eventBus.PublishAsync(ev, cancellationToken);
 
