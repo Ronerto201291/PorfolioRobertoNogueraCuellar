@@ -19,10 +19,16 @@ namespace PruebaAngular.Infrastructure.Messaging
     public class RabbitMqEventBus : IEventBus, IDisposable
     {
         private readonly IConnection _connection;
-        private readonly IChannel _channel;
+        private IChannel _channel;
         private readonly ILogger<RabbitMqEventBus> _logger;
         private readonly ConcurrentQueue<EventActivity> _activityLog;
         private const string ExchangeName = "activity.events";
+        private const string RetryExchangeName = "activity.events.retry";
+        private const string DeadLetterExchangeName = "activity.events.dlq";
+        private const string QueueName = "activity.events";
+        private const string RetryQueueName = "activity.events.retry";
+        private const string DeadLetterQueueName = "activity.events.dlq";
+        private const int RetryDelayMilliseconds = 5000;
         private const int MaxActivityLogSize = 100;
 
         public RabbitMqEventBus(
@@ -34,11 +40,7 @@ namespace PruebaAngular.Infrastructure.Messaging
             _logger = logger;
             _activityLog = new ConcurrentQueue<EventActivity>();
 
-            _channel.ExchangeDeclareAsync(
-                exchange: ExchangeName,
-                type: ExchangeType.Topic,
-                durable: true,
-                autoDelete: false).GetAwaiter().GetResult();
+            DeclareTopology();
 
             _logger.LogInformation("[RabbitMQ] EventBus inicializado. Exchange: {Exchange}", ExchangeName);
         }
@@ -49,6 +51,7 @@ namespace PruebaAngular.Infrastructure.Messaging
             try
             {
                 var routingKey = domainEvent.EventType.ToLowerInvariant();
+                var correlationId = domainEvent.EventId.ToString();
                 var messageBody = JsonSerializer.Serialize(domainEvent, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -60,8 +63,12 @@ namespace PruebaAngular.Infrastructure.Messaging
                     ContentType = "application/json",
                     DeliveryMode = DeliveryModes.Persistent,
                     MessageId = domainEvent.EventId.ToString(),
+                    CorrelationId = correlationId,
                     Timestamp = new AmqpTimestamp(domainEvent.OccurredAt.ToUnixTimeSeconds())
                 };
+
+                properties.Headers ??= new Dictionary<string, object>();
+                properties.Headers["correlation-id"] = correlationId;
 
                 await _channel.BasicPublishAsync(
                     exchange: ExchangeName,
@@ -72,9 +79,11 @@ namespace PruebaAngular.Infrastructure.Messaging
                     cancellationToken: cancellationToken);
 
                 _logger.LogInformation(
-                    "[RabbitMQ] Published {EventType} (EventId={EventId})",
+                    "[PortfolioApi] Published {EventType} CorrelationId={CorrelationId} Exchange={Exchange} RoutingKey={RoutingKey}",
                     domainEvent.EventType,
-                    domainEvent.EventId);
+                    correlationId,
+                    ExchangeName,
+                    routingKey);
 
                 RecordActivity(new EventActivity
                 {
@@ -82,7 +91,7 @@ namespace PruebaAngular.Infrastructure.Messaging
                     EventType = domainEvent.EventType,
                     Timestamp = DateTimeOffset.UtcNow,
                     Status = EventActivityStatus.Published,
-                    Details = $"RoutingKey: {routingKey}"
+                    Details = $"Exchange={ExchangeName}; RoutingKey={routingKey}; CorrelationId={correlationId}"
                 });
             }
             catch (Exception ex)
@@ -126,6 +135,105 @@ namespace PruebaAngular.Infrastructure.Messaging
         {
             _channel?.Dispose();
             _connection?.Dispose();
+        }
+
+        private void DeclareTopology()
+        {
+            _channel.ExchangeDeclareAsync(
+                exchange: ExchangeName,
+                type: ExchangeType.Topic,
+                durable: true,
+                autoDelete: false).GetAwaiter().GetResult();
+
+            _channel.ExchangeDeclareAsync(
+                exchange: RetryExchangeName,
+                type: ExchangeType.Topic,
+                durable: true,
+                autoDelete: false).GetAwaiter().GetResult();
+
+            _channel.ExchangeDeclareAsync(
+                exchange: DeadLetterExchangeName,
+                type: ExchangeType.Topic,
+                durable: true,
+                autoDelete: false).GetAwaiter().GetResult();
+
+            DeclareQueueWithReset(
+                QueueName,
+                new Dictionary<string, object>
+                {
+                    ["x-dead-letter-exchange"] = RetryExchangeName
+                });
+
+            DeclareQueueWithReset(
+                RetryQueueName,
+                new Dictionary<string, object>
+                {
+                    ["x-message-ttl"] = RetryDelayMilliseconds,
+                    ["x-dead-letter-exchange"] = ExchangeName
+                });
+
+            DeclareQueueWithReset(DeadLetterQueueName, null);
+
+            _channel.QueueBindAsync(
+                queue: QueueName,
+                exchange: ExchangeName,
+                routingKey: "#").GetAwaiter().GetResult();
+
+            _channel.QueueBindAsync(
+                queue: RetryQueueName,
+                exchange: RetryExchangeName,
+                routingKey: "#").GetAwaiter().GetResult();
+
+            _channel.QueueBindAsync(
+                queue: DeadLetterQueueName,
+                exchange: DeadLetterExchangeName,
+                routingKey: "#").GetAwaiter().GetResult();
+        }
+
+        private void DeclareQueueWithReset(string queueName, IDictionary<string, object>? arguments)
+        {
+            try
+            {
+                _channel.QueueDeclareAsync(
+                    queue: queueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: arguments).GetAwaiter().GetResult();
+            }
+            catch (RabbitMQ.Client.Exceptions.OperationInterruptedException)
+            {
+                ResetChannel();
+                TryDeleteQueue(queueName);
+                _channel.QueueDeclareAsync(
+                    queue: queueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: arguments).GetAwaiter().GetResult();
+            }
+        }
+
+        private void TryDeleteQueue(string queueName)
+        {
+            try
+            {
+                _channel.QueueDeleteAsync(queue: queueName, ifUnused: false, ifEmpty: false).GetAwaiter().GetResult();
+            }
+            catch (RabbitMQ.Client.Exceptions.OperationInterruptedException)
+            {
+                ResetChannel();
+            }
+        }
+
+        private void ResetChannel()
+        {
+            if (_channel.IsOpen)
+            {
+                return;
+            }
+
+            _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
         }
     }
 }
