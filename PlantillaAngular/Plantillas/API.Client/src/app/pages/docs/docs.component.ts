@@ -136,6 +136,7 @@ Refleja cómo se estructura una aplicación orientada a producción, no un simpl
     { name: '.NET 10', category: 'Backend' },
     { name: 'Angular 17', category: 'Frontend' },
     { name: 'GraphQL', category: 'API' },
+    { name: 'RabbitMQ', category: 'Mensajería' },
     { name: 'PostgreSQL', category: 'Base de datos' },
     { name: 'Docker', category: 'Infraestructura' },
     { name: 'Aspire', category: 'Orquestación' }
