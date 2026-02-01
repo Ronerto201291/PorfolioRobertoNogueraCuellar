@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,73 +7,52 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TaskStatus } from '../../../models/task.models';
 
 export interface TaskDialogData {
   title: string;
-  description: string;
-  status: string;
-  priority: string;
+  description: string | null;
+  status: TaskStatus;
 }
 
 @Component({
   selector: 'app-edit-task-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule],
   template: `
-    <h2 class="dialog-title">{{ data.title ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
-    <div class="dialog-body">
-      <mat-form-field appearance="outline" class="full">
+    <h1 mat-dialog-title>{{ data.title ? 'Editar Tarea' : 'Nueva Tarea' }}</h1>
+    <div mat-dialog-content class="dialog-content">
+      <mat-form-field appearance="fill" style="width:100%">
         <mat-label>Título</mat-label>
-        <input matInput [(ngModel)]="data.title" maxlength="200" required />
+        <input matInput name="title" [(ngModel)]="data.title" [ngModelOptions]="{ standalone: true }" maxlength="200" required cdkFocusInitial>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full">
+      <mat-form-field appearance="fill" style="width:100%">
         <mat-label>Descripción</mat-label>
-        <textarea matInput rows="4" [(ngModel)]="data.description" maxlength="1000"></textarea>
+        <textarea matInput name="description" rows="4" [(ngModel)]="data.description" [ngModelOptions]="{ standalone: true }" maxlength="1000"></textarea>
       </mat-form-field>
 
-      <div class="row">
-        <mat-form-field appearance="outline" class="half">
-          <mat-label>Estado</mat-label>
-          <mat-select [(ngModel)]="data.status">
-            <mat-option value="Pending">Pendiente</mat-option>
-            <mat-option value="InProgress">En Progreso</mat-option>
-            <mat-option value="Completed">Completada</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="half">
-          <mat-label>Prioridad</mat-label>
-          <mat-select [(ngModel)]="data.priority">
-            <mat-option value="Low">Baja</mat-option>
-            <mat-option value="Medium">Media</mat-option>
-            <mat-option value="High">Alta</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+      <mat-form-field appearance="fill" style="width:100%">
+        <mat-label>Estado</mat-label>
+        <mat-select name="status" [(ngModel)]="data.status" [ngModelOptions]="{ standalone: true }">
+          <mat-option value="Pending">Pendiente</mat-option>
+          <mat-option value="InProgress">En Progreso</mat-option>
+          <mat-option value="Completed">Finalizada</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
-    <div class="dialog-actions">
-      <button mat-stroked-button color="warn" (click)="cancel()">
-        <mat-icon>close</mat-icon>
-        Cancelar
-      </button>
+    <div mat-dialog-actions align="end">
+      <button mat-button (click)="cancel()">Cancelar</button>
       <button mat-flat-button color="primary" [disabled]="!data.title?.trim() || isSubmitting()" (click)="save()">
-        <mat-icon *ngIf="!isSubmitting()">save</mat-icon>
-        <mat-icon *ngIf="isSubmitting()" class="rotating">autorenew</mat-icon>
         {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
       </button>
     </div>
   `,
   styles: [
-    `:host { display:block; width:100% }
-     .dialog-body { display:flex; flex-direction:column; gap:12px; padding:8px 0 }
-     .full { width:100% }
-     .row { display:flex; gap:12px }
-     .half { flex:1 }
-     .dialog-actions { display:flex; justify-content:flex-end; gap:8px; padding-top:12px }
-     .rotating { animation:spin 1s linear infinite }
-     @keyframes spin { to { transform: rotate(360deg) } }
+    `:host { display:block }
+     .dialog-content { max-height: 60vh; overflow: auto; padding-right: 4px }
+     mat-form-field { display: block; }
     `]
 })
 export class EditTaskDialogComponent {

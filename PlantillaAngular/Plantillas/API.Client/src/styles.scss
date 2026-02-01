@@ -350,6 +350,32 @@ html, body, ion-app, ion-content, .mat-mdc-dialog-panel, .mat-dialog-container, 
   filter: none !important;
 }
 
+/* Ensure Material inputs render visible text/caret in dialogs */
+.mat-mdc-form-field .mat-mdc-input-element,
+.mat-mdc-form-field textarea.mat-mdc-input-element,
+.mat-mdc-form-field input.mat-mdc-input-element {
+  color: #0f172a !important;
+  caret-color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background: transparent !important;
+  opacity: 1 !important;
+}
+
+.mdc-text-field__input,
+.mat-mdc-form-field-input-control {
+  color: #0f172a !important;
+  caret-color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-input-text-color: #0f172a;
+  --mdc-outlined-text-field-caret-color: #0f172a;
+  --mdc-filled-text-field-input-text-color: #0f172a;
+  --mdc-filled-text-field-caret-color: #0f172a;
+}
+
 /* Ensure any header-like elements used inside dialogs are visible */
 .header-md, .header-collapse-none, .hydrated, .mdc-dialog__title, .mat-mdc-dialog-title {
   color: #0f172a !important;

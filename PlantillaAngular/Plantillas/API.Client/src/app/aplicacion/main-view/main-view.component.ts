@@ -3,7 +3,11 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { PortfolioService, Project, PortfolioTask } from '../../services/portfolio.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatChipsModule } from '@angular/material/chips';
+import { PortfolioService, Project } from '../../services/portfolio.service';
 import { ProjectCardComponent } from '../components/project-card/project-card.component';
 import { KanbanBoardComponent } from '../components/kanban-board/kanban-board.component';
 import { TaskCardComponent } from '../components/task-card/task-card.component';
@@ -11,19 +15,23 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EditProjectDialogComponent, ProjectDialogData } from '../components/edit-project-dialog/edit-project-dialog.component';
 import { EditTaskDialogComponent, TaskDialogData } from '../components/edit-task-dialog/edit-task-dialog.component';
+import { TaskService } from '../../services/task.service';
+import { CreateTaskRequest, Task, TaskStatus, UpdateTaskRequest } from '../../models/task.models';
 
 @Component({
   selector: 'app-main-view',
   templateUrl: './main-view.component.html',
   styleUrls: ['./main-view.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, ProjectCardComponent, KanbanBoardComponent, TaskCardComponent]
+  imports: [CommonModule, FormsModule, IonicModule, MatButtonModule, MatIconModule, MatListModule, MatChipsModule, ProjectCardComponent, KanbanBoardComponent, TaskCardComponent]
 })
 export class MainViewComponent implements OnInit {
 
   projects = signal<Project[]>([]);
   selectedProject = signal<Project | null>(null);
+  projectTasks = signal<Task[]>([]);
   isLoading = signal<boolean>(false);
+  isTasksLoading = signal<boolean>(false);
   isUpdating = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -36,6 +44,7 @@ export class MainViewComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
+    private taskService: TaskService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) { }
@@ -52,8 +61,15 @@ export class MainViewComponent implements OnInit {
       next: (projects) => {
         const projectList = projects ?? [];
         this.projects.set(projectList);
-        if (projectList.length > 0 && !this.selectedProject()) {
-          this.selectedProject.set(projectList[0]);
+        const current = this.selectedProject();
+        const selected = current && projectList.some(p => p.projectId === current.projectId)
+          ? current
+          : (projectList[0] ?? null);
+        this.selectedProject.set(selected);
+        if (selected) {
+          this.loadTasks(selected.projectId);
+        } else {
+          this.projectTasks.set([]);
         }
         this.isLoading.set(false);
       },
@@ -68,6 +84,7 @@ export class MainViewComponent implements OnInit {
   selectProject(project: Project): void {
     this.selectedProject.set(project);
     this.successMessage.set(null);
+    this.loadTasks(project.projectId);
   }
 
   // ========== PROYECTOS ==========
@@ -139,22 +156,21 @@ export class MainViewComponent implements OnInit {
       data: {
         title: '',
         description: '',
-        status: 'Pending',
-        priority: 'Medium'
+        status: 'Pending'
       } as TaskDialogData
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.portfolioService.createTask(
-          project.projectId,
-          result.title,
-          result.status,
-          result.priority,
-          result.description
-        ).subscribe({
+        const request: CreateTaskRequest = {
+          projectId: project.projectId,
+          title: result.title,
+          description: result.description || null,
+          status: result.status as TaskStatus
+        };
+        this.taskService.createTask(project.projectId, request).subscribe({
           next: () => {
             this.snackBar.open('Tarea creada', 'Cerrar', { duration: 2000 });
-            this.loadProjects();
+            this.loadTasks(project.projectId);
           },
           error: () => this.snackBar.open('Error al crear tarea', 'Cerrar', { duration: 3000 })
         });
@@ -162,24 +178,28 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  openEditTaskDialog(task: PortfolioTask): void {
+  openEditTaskDialog(task: Task): void {
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {
       width: '400px',
       data: {
         title: task.title,
         description: task.description,
-        status: task.status,
-        priority: task.priority
+        status: task.status
       } as TaskDialogData
     });
     dialogRef.afterClosed().subscribe({
       next: (result) => {
         if (result) {
-          const updated = { ...task, ...result };
-          this.portfolioService.updateTask(updated).subscribe({
+          const request: UpdateTaskRequest = {
+            title: result.title,
+            description: result.description || null,
+            status: result.status as TaskStatus
+          };
+          this.taskService.updateTask(task.id, request).subscribe({
             next: () => {
               this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2000 });
-              this.loadProjects();
+              const projectId = this.selectedProject()?.projectId;
+              if (projectId) this.loadTasks(projectId);
             },
             error: () => this.snackBar.open('Error al actualizar tarea', 'Cerrar', { duration: 3000 })
           });
@@ -188,7 +208,7 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  confirmDeleteTask(task: PortfolioTask): void {
+  confirmDeleteTask(task: Task): void {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       width: '320px',
       data: { message: `¿Eliminar la tarea "${task.title}"?` }
@@ -196,10 +216,11 @@ export class MainViewComponent implements OnInit {
     dialogRef.afterClosed().subscribe({
       next: (result) => {
         if (result) {
-          this.portfolioService.deleteTask(task.taskId).subscribe({
+          this.taskService.deleteTask(task.id).subscribe({
             next: () => {
               this.snackBar.open('Tarea eliminada', 'Cerrar', { duration: 2000 });
-              this.loadProjects();
+              const projectId = this.selectedProject()?.projectId;
+              if (projectId) this.loadTasks(projectId);
             },
             error: () => this.snackBar.open('Error al eliminar tarea', 'Cerrar', { duration: 3000 })
           });
@@ -247,30 +268,32 @@ export class MainViewComponent implements OnInit {
       });
   }
 
-  onTaskStatusChanged(event: { taskId: string; newStatus: string }): void {
+  onTaskStatusChanged(event: { taskId: string; newStatus: TaskStatus }): void {
     this.isUpdating.set(true);
     this.successMessage.set(null);
-    
-    this.portfolioService.updateTaskStatus(event.taskId, event.newStatus).subscribe({
-      next: (updatedTask) => {
-        if (updatedTask) {
-          const project = this.selectedProject();
-          if (project) {
-            const taskIndex = project.tasks.findIndex(t => t.taskId === event.taskId);
-            if (taskIndex !== -1) {
-              project.tasks[taskIndex].status = event.newStatus;
-              this.selectedProject.set({ ...project });
-            }
-          }
-          this.showSuccess(`Tarea movida a ${this.getStatusLabel(event.newStatus)}`);
-        }
+    const task = this.projectTasks().find(t => t.id === event.taskId);
+    if (!task) {
+      this.isUpdating.set(false);
+      return;
+    }
+    const request: UpdateTaskRequest = {
+      title: task.title,
+      description: task.description,
+      status: event.newStatus
+    };
+    this.taskService.updateTask(task.id, request).subscribe({
+      next: () => {
+        this.showSuccess(`Tarea movida a ${this.getStatusLabel(event.newStatus)}`);
+        const projectId = this.selectedProject()?.projectId;
+        if (projectId) this.loadTasks(projectId);
         this.isUpdating.set(false);
       },
       error: (error) => {
         console.error('Error al actualizar tarea:', error);
         this.errorMessage.set('Error al actualizar la tarea. Inténtalo de nuevo.');
         this.isUpdating.set(false);
-        this.loadProjects();
+        const projectId = this.selectedProject()?.projectId;
+        if (projectId) this.loadTasks(projectId);
       }
     });
   }
@@ -278,22 +301,20 @@ export class MainViewComponent implements OnInit {
   // ========== HELPERS ==========
 
   getTotalTasks(): number {
-    return this.projects().reduce((total, project) => total + (project.tasks?.length || 0), 0);
+    return this.projectTasks().length;
   }
 
   getCompletedTasks(): number {
-    return this.projects().reduce((total, project) => 
-      total + (project.tasks?.filter(t => t.status === 'Completed').length || 0), 0);
+    return this.projectTasks().filter(t => t.status === 'Completed').length;
   }
 
   getInProgressTasks(): number {
-    return this.projects().reduce((total, project) => 
-      total + (project.tasks?.filter(t => t.status === 'InProgress').length || 0), 0);
+    return this.projectTasks().filter(t => t.status === 'InProgress').length;
   }
 
   getProjectProgress(project: Project): number {
     if (!project.tasks || project.tasks.length === 0) return 0;
-    const completed = project.tasks.filter(t => t.status === 'Completed').length;
+    const completed = project.tasks.filter(t => t.status === 'Done' || t.status === 'Completed').length;
     return Math.round((completed / project.tasks.length) * 100);
   }
 
@@ -302,13 +323,29 @@ export class MainViewComponent implements OnInit {
     setTimeout(() => this.successMessage.set(null), 3000);
   }
 
-  private getStatusLabel(status: string): string {
+  private getStatusLabel(status: TaskStatus): string {
     switch (status) {
       case 'Pending': return 'Pendiente';
       case 'InProgress': return 'En Progreso';
-      case 'Completed': return 'Completada';
+      case 'Completed': return 'Finalizada';
       default: return status;
     }
+  }
+
+  private loadTasks(projectId: string): void {
+    this.isTasksLoading.set(true);
+    this.taskService.getTasks(projectId).subscribe({
+      next: (tasks) => {
+        this.projectTasks.set(tasks ?? []);
+        this.isTasksLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error al cargar tareas:', error);
+        this.errorMessage.set('No se pudieron cargar las tareas del proyecto.');
+        this.projectTasks.set([]);
+        this.isTasksLoading.set(false);
+      }
+    });
   }
 }
 

@@ -109,6 +109,6 @@ export class ProjectCardComponent {
   }
 
   getCompletedCount(): number {
-    return this.project.tasks?.filter(t => t.status === 'Completed').length || 0;
+    return this.project.tasks?.filter(t => t.status === 'Done' || t.status === 'Completed').length || 0;
   }
 }

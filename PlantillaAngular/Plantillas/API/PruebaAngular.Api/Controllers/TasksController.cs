@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PruebaAngular.Api.Model;
 using PruebaAngular.Application.Commands;
+using PruebaAngular.Application.DTO.Requests;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -141,84 +142,5 @@ namespace PruebaAngular.Api.Controllers
         }
     }
 
-    /// <summary>
-    /// Request para crear una nueva tarea
-    /// </summary>
-    public class CreateTaskRequest
-    {
-        /// <summary>
-        /// ID del proyecto al que pertenece la tarea
-        /// </summary>
-        [Required(ErrorMessage = "El ID del proyecto es obligatorio")]
-        public Guid ProjectId { get; set; }
 
-        /// <summary>
-        /// Título de la tarea (obligatorio, máximo 200 caracteres)
-        /// </summary>
-        /// <example>Implementar autenticación</example>
-        [Required(ErrorMessage = "El título de la tarea es obligatorio")]
-        [StringLength(200, ErrorMessage = "El título no puede exceder 200 caracteres")]
-        public string Title { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Descripción de la tarea (opcional, máximo 1000 caracteres)
-        /// </summary>
-        /// <example>Implementar autenticación JWT con refresh tokens</example>
-        [StringLength(1000, ErrorMessage = "La descripción no puede exceder 1000 caracteres")]
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Estado de la tarea: Pending, InProgress, Completed
-        /// </summary>
-        /// <example>Pending</example>
-        public string Status { get; set; } = "Pending";
-
-        /// <summary>
-        /// Prioridad de la tarea: Low, Medium, High
-        /// </summary>
-        /// <example>Medium</example>
-        public string Priority { get; set; } = "Medium";
-
-        /// <summary>
-        /// Fecha límite de la tarea (opcional)
-        /// </summary>
-        public DateTimeOffset? DueDate { get; set; }
-    }
-
-    /// <summary>
-    /// Request para actualizar una tarea existente
-    /// </summary>
-    public class UpdateTaskRequest
-    {
-        /// <summary>
-        /// Título de la tarea (obligatorio, máximo 200 caracteres)
-        /// </summary>
-        /// <example>Implementar autenticación - Actualizado</example>
-        [Required(ErrorMessage = "El título de la tarea es obligatorio")]
-        [StringLength(200, ErrorMessage = "El título no puede exceder 200 caracteres")]
-        public string Title { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Descripción de la tarea (opcional, máximo 1000 caracteres)
-        /// </summary>
-        [StringLength(1000, ErrorMessage = "La descripción no puede exceder 1000 caracteres")]
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Estado de la tarea: Pending, InProgress, Completed
-        /// </summary>
-        /// <example>InProgress</example>
-        public string Status { get; set; } = "Pending";
-
-        /// <summary>
-        /// Prioridad de la tarea: Low, Medium, High
-        /// </summary>
-        /// <example>High</example>
-        public string Priority { get; set; } = "Medium";
-
-        /// <summary>
-        /// Fecha límite de la tarea (opcional)
-        /// </summary>
-        public DateTimeOffset? DueDate { get; set; }
-    }
 }

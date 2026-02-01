@@ -2,14 +2,14 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
 import { IonicModule } from '@ionic/angular';
-import { PortfolioTask } from '../../../services/portfolio.service';
+import { Task, TaskStatus } from '../../../models/task.models';
 
 export interface KanbanColumn {
   id: string;
   title: string;
   icon: string;
   color: string;
-  tasks: PortfolioTask[];
+  tasks: Task[];
 }
 
 @Component({
@@ -145,10 +145,10 @@ export interface KanbanColumn {
   imports: [CommonModule, DragDropModule, IonicModule]
 })
 export class KanbanBoardComponent {
-  @Input() tasks: PortfolioTask[] = [];
-  @Output() taskStatusChanged = new EventEmitter<{ taskId: string; newStatus: string }>();
-  @Output() editTask = new EventEmitter<PortfolioTask>();
-  @Output() deleteTask = new EventEmitter<PortfolioTask>();
+  @Input() tasks: Task[] = [];
+  @Output() taskStatusChanged = new EventEmitter<{ taskId: string; newStatus: TaskStatus }>();
+  @Output() editTask = new EventEmitter<Task>();
+  @Output() deleteTask = new EventEmitter<Task>();
 
   get columns(): KanbanColumn[] {
     return [
@@ -168,7 +168,7 @@ export class KanbanBoardComponent {
       },
       {
         id: 'Completed',
-        title: 'Completada',
+        title: 'Finalizada',
         icon: '✅',
         color: '#4caf50',
         tasks: this.tasks.filter(t => t.status === 'Completed')
@@ -180,30 +180,30 @@ export class KanbanBoardComponent {
     return ['Pending', 'InProgress', 'Completed'].filter(id => id !== currentId);
   }
 
-  onDrop(event: CdkDragDrop<PortfolioTask[]>, columnId: string): void {
+  onDrop(event: CdkDragDrop<Task[]>, columnId: string): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      const task = event.item.data as PortfolioTask;
+      const task = event.item.data as Task;
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
-      this.taskStatusChanged.emit({ taskId: task.taskId, newStatus: columnId });
+      this.taskStatusChanged.emit({ taskId: task.id, newStatus: columnId as TaskStatus });
     }
   }
 
-  onStatusChange(event: { taskId: string; newStatus: string }): void {
+  onStatusChange(event: { taskId: string; newStatus: TaskStatus }): void {
     this.taskStatusChanged.emit({ taskId: event.taskId, newStatus: event.newStatus });
   }
 
-  onEditTask(task: PortfolioTask): void {
+  onEditTask(task: Task): void {
     this.editTask.emit(task);
   }
 
-  onDeleteTask(task: PortfolioTask): void {
+  onDeleteTask(task: Task): void {
     this.deleteTask.emit(task);
   }
 }

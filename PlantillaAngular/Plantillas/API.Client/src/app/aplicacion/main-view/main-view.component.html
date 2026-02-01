@@ -11,16 +11,12 @@
 
       <div class="header-stats" *ngIf="!isLoading() && projects().length > 0">
         <div class="stat-item">
-          <span class="stat-value">{{ projects().length }}</span>
-          <span class="stat-label">Proyectos</span>
-        </div>
-        <div class="stat-item">
           <span class="stat-value">{{ getTotalTasks() }}</span>
           <span class="stat-label">Total Tareas</span>
         </div>
         <div class="stat-item completed">
           <span class="stat-value">{{ getCompletedTasks() }}</span>
-          <span class="stat-label">Completadas</span>
+          <span class="stat-label">Finalizadas</span>
         </div>
         <div class="stat-item in-progress">
           <span class="stat-value">{{ getInProgressTasks() }}</span>
@@ -110,13 +106,40 @@
             </div>
           </div>
 
-          <app-kanban-board 
-            *ngIf="selectedProject()"
-            [tasks]="selectedProject()?.tasks || []"
-            (taskStatusChanged)="onTaskStatusChanged($event)"
-            (editTask)="openEditTaskDialog($event)"
-            (deleteTask)="confirmDeleteTask($event)">
-          </app-kanban-board>
+          <div *ngIf="isTasksLoading()" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Cargando tareas...</p>
+          </div>
+
+          <div *ngIf="selectedProject() && !isTasksLoading()" class="tasks-list">
+            <mat-list *ngIf="projectTasks().length > 0; else emptyTasks">
+              <mat-list-item *ngFor="let task of projectTasks()">
+                <div class="task-item">
+                  <div class="task-info">
+                    <h4>{{ task.title }}</h4>
+                    <p>{{ task.description || 'Sin descripción' }}</p>
+                  </div>
+                  <div class="task-meta">
+                    <mat-chip [ngClass]="'status-' + task.status.toLowerCase()">{{ getStatusLabel(task.status) }}</mat-chip>
+                    <ion-buttons class="task-actions">
+                      <ion-button fill="clear" color="medium" (click)="openEditTaskDialog(task)" aria-label="Editar tarea">
+                        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button fill="clear" color="danger" (click)="confirmDeleteTask(task)" aria-label="Eliminar tarea">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-button>
+                    </ion-buttons>
+                  </div>
+                </div>
+              </mat-list-item>
+            </mat-list>
+
+            <ng-template #emptyTasks>
+              <div class="empty-tasks">
+                <span>Este proyecto aún no tiene tareas.</span>
+              </div>
+            </ng-template>
+          </div>
 
           <div *ngIf="!selectedProject() && projects().length > 0" class="select-project">
             <span class="select-icon">👈</span>
