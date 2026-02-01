@@ -35,6 +35,7 @@ namespace PruebaAngular.Infrastructure.Data
 
             modelBuilder.ApplyConfiguration(new ProjectConfiguration());
             modelBuilder.ApplyConfiguration(new PortfolioTaskConfiguration());
+            modelBuilder.ApplyConfiguration(new NotificationSubscriberConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
